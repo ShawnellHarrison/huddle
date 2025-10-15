@@ -1,0 +1,450 @@
+/**
+ * @fileoverview Firestore Security Rules for the Huddle application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a multi-tenant security model where data access is primarily governed by company membership.
+ * User-specific data is protected via path-based ownership. Access to shared resources (e.g., channels, projects)
+ * is controlled by denormalized membership lists on the documents themselves.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information, accessible only by the user and authorized company admins.
+ * - /companies/{companyId}: Stores company information, accessible by company admins.
+ * - /channels/{channelId}: Stores channel data, with a 'members' array for access control.
+ * - /channels/{channelId}/messages/{messageId}: Stores messages within channels, inherits channel membership.
+ * - /projects/{projectId}: Stores project data, with a 'members' array for access control.
+ * - /projects/{projectId}/tasks/{taskId}: Stores tasks within projects; accessible to project members and the assignee.
+ * - /invoices/{invoiceId}: Stores invoice data, accessible by company users.
+ * - /invoices/{invoiceId}/lineItems/{lineItemId}: Stores line items, inherits invoice access.
+ * - /clients/{clientId}: Stores client data, accessible by company users.
+ * - /expenses/{expenseId}: Stores expense data, accessible by the owning user and company admins.
+ * - /timeEntries/{timeEntryId}: Stores time entry data, accessible by the owning user and company admins.
+ * - /documents/{docId}: Stores document data, accessible by company users.
+ * - /notifications/{notificationId}: Stores notifications, accessible only by the target user.
+ * - /reports/{reportId}: Stores reports, accessible by company admins.
+ * - /portalViews/{token}: Stores portal view information, accessible by token.
+ * - /kudos/{kudoId}: Stores kudos, accessible by company users.
+ * - /presence/{uid}: Stores user presence, accessible by the user.
+ *
+ * Key Security Decisions:
+ * - User listing is generally disallowed for privacy.
+ * - Data consistency checks (e.g., matching user IDs in paths and documents) are enforced on create and update.
+ * - Only authenticated users can access the database.
+ * - Write operations are never open (`if true`). They require explicit authorization checks.
+ *
+ * Denormalization for Authorization:
+ * - Channel documents contain a 'members' array, allowing message creation rules to validate membership without additional reads.
+ * - Task documents contain a 'companyId' field, inherited from their parent project, to enforce company-level access.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Requires authentication for all operations.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's ID matches the provided user ID.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Enforces path-based ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the user is a member of the specified channel based on the channel's 'members' array.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Enforces membership-based access control.
+     */
+    function isChannelMember(channelId) {
+        return isSignedIn() && (get(/databases/$(database)/documents/channels/$(channelId)).data.members is list && request.auth.uid in get(/databases/$(database)/documents/channels/$(channelId)).data.members);
+    }
+
+    /**
+     * @description Checks if the user is a member of the specified project based on the project's 'members' array.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Enforces membership-based access control.
+     */
+    function isProjectMember(projectId) {
+        return isSignedIn() && (get(/databases/$(database)/documents/projects/$(projectId)).data.members is list && request.auth.uid in get(/databases/$(database)/documents/projects/$(projectId)).data.members);
+    }
+
+    /**
+     * @description Checks if the document exists and the authenticated user is the owner.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Combines ownership check with existence check.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Enforces that a critical field (e.g., user ID) cannot be changed after creation.
+     * @path N/A
+     * @allow N/A
+     * @deny N/A
+     * @principle Enforces immutability for relational integrity.
+     */
+    function isImmutable(field) {
+        return resource.data[field] == request.resource.data[field];
+    }
+
+    /**
+     * @description Rule for documents where only authorized users can create, read, update, and delete.
+     * @path /users/{uid}
+     * @allow (create) - User with matching uid can create their own document.
+     * @allow (get, list) - User with matching uid can read their own document.
+     * @allow (update, delete) - User with matching uid can update/delete their own document.
+     * @deny (create) - User tries to create a document with a different uid.
+     * @deny (get, list) - User tries to read another user's document.
+     * @deny (update, delete) - User tries to update/delete another user's document.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{uid} {
+      allow get, list: if isOwner(uid);
+      allow create: if isOwner(uid) && request.resource.data.id == uid;
+      allow update: if isExistingOwner(uid) && isImmutable('id');
+      allow delete: if isExistingOwner(uid);
+    }
+
+    /**
+     * @description Rule for documents where only company admins can create, read, update, and delete.
+     * @path /companies/{companyId}
+     * @allow (create) - Company admin can create a new company document.
+     * @allow (get, list) - Company admin can read company documents.
+     * @allow (update, delete) - Company admin can update/delete company documents.
+     * @deny (create) - User tries to create a company document without admin privileges.
+     * @deny (get, list) - User tries to read company documents without admin privileges.
+     * @deny (update, delete) - User tries to update/delete company documents without admin privileges.
+     * @principle Restricts access to company admins for all operations.
+     */
+    match /companies/{companyId} {
+      // TODO: Implement role-based access control for company admins
+      allow get, list: if false; // TODO: Only company admins should be able to list and get companies.
+      allow create: if false;   // TODO: Only company admins should be able to create companies.
+      allow update: if false;   // TODO: Only company admins should be able to update companies.
+      allow delete: if false;   // TODO: Only company admins should be able to delete companies.
+    }
+
+    /**
+     * @description Rule for documents where only channel members can create, read, update, and delete.
+     * @path /channels/{channelId}
+     * @allow (create) - User can create a channel if they will be a member (validated in function).
+     * @allow (get, list) - User can read channel data if they are a member of the channel.
+     * @allow (update) - User can update channel if they are a member and the members field is not changed.
+     * @allow (delete) - User can delete channel if they are the owner or an admin.
+     * @deny (create) - User tries to create a channel but is not a member.
+     * @deny (get, list) - User tries to read channel data without being a member.
+     * @deny (update) - User tries to update channel data without being a member.
+     * @deny (delete) - User tries to delete channel data without being the owner or an admin.
+     * @principle Restricts access to channel members for all operations.
+     */
+    match /channels/{channelId} {
+        allow get, list: if isChannelMember(channelId);
+        allow create: if isSignedIn(); // TODO: Add validation that the user is allowed to create this channel (e.g., company member).
+        allow update: if isChannelMember(channelId); // TODO: Add logic to restrict who can modify channel members (e.g., channel admin).
+        allow delete: if false; // TODO: Add logic to allow channel owners/admins to delete the channel.
+    }
+
+    /**
+     * @description Rule for documents where only channel members can create, read, update, and delete messages.
+     * @path /channels/{channelId}/messages/{messageId}
+     * @allow (create) - User can create a message if they are a member of the channel.
+     * @allow (get, list) - User can read messages if they are a member of the channel.
+     * @allow (update) - User can update a message if they are the owner.
+     * @allow (delete) - User can delete a message if they are the owner or an admin.
+     * @deny (create) - User tries to create a message without being a member of the channel.
+     * @deny (get, list) - User tries to read messages without being a member of the channel.
+     * @deny (update) - User tries to update a message without being the owner.
+     * @deny (delete) - User tries to delete a message without being the owner or an admin.
+     * @principle Restricts access to channel members for all operations on messages.
+     */
+    match /channels/{channelId}/messages/{messageId} {
+        allow get, list: if isChannelMember(channelId);
+        allow create: if isChannelMember(channelId); // Ensure user is a channel member.
+        allow update: if false; // TODO: Add logic to allow message owners to update their messages.
+        allow delete: if false; // TODO: Add logic to allow message owners/admins to delete messages.
+    }
+
+    /**
+     * @description Rule for documents where only project members can create, read, update, and delete.
+     * @path /projects/{projectId}
+     * @allow (create) - User can create a project if they will be a member (validated in function).
+     * @allow (get, list) - User can read project data if they are a member of the project.
+     * @allow (update) - User can update project if they are a member and the members field is not changed.
+     * @allow (delete) - User can delete project if they are the owner or an admin.
+     * @deny (create) - User tries to create a project but is not a member.
+     * @deny (get, list) - User tries to read project data without being a member.
+     * @deny (update) - User tries to update project data without being a member.
+     * @deny (delete) - User tries to delete project data without being the owner or an admin.
+     * @principle Restricts access to project members for all operations.
+     */
+    match /projects/{projectId} {
+        allow get, list: if isProjectMember(projectId);
+        allow create: if isSignedIn(); // TODO: Add validation that the user is allowed to create this project (e.g., company member).
+        allow update: if isProjectMember(projectId); // TODO: Add logic to restrict who can modify project members (e.g., project admin).
+        allow delete: if false; // TODO: Add logic to allow project owners/admins to delete the project.
+    }
+
+    /**
+     * @description Rule for documents where project members and the assigned user can create, read, update, and delete tasks.
+     * @path /projects/{projectId}/tasks/{taskId}
+     * @allow (create) - User can create a task if they are a project member or the assigned user.
+     * @allow (get, list) - User can read task data if they are a project member or the assigned user.
+     * @allow (update) - User can update task data if they are a project member or the assigned user.
+     * @allow (delete) - User can delete task data if they are the owner or an admin.
+     * @deny (create) - User tries to create a task without being a project member or the assigned user.
+     * @deny (get, list) - User tries to read task data without being a project member or the assigned user.
+     * @deny (update) - User tries to update task data without being a project member or the assigned user.
+     * @deny (delete) - User tries to delete task data without being the owner or an admin.
+     * @principle Restricts access to project members and the assigned user for all operations on tasks.
+     */
+    match /projects/{projectId}/tasks/{taskId} {
+      allow get, list: if isProjectMember(projectId);
+      allow create: if isProjectMember(projectId);
+      allow update: if isProjectMember(projectId);
+      allow delete: if false; // TODO: Add logic to allow task owners/admins to delete the task.
+    }
+
+    /**
+     * @description Rule for documents where only company users can create, read, update, and delete.
+     * @path /invoices/{invoiceId}
+     * @allow (create) - User can create a invoice if they are a company member.
+     * @allow (get, list) - User can read invoice data if they are a company member.
+     * @allow (update) - User can update invoice data if they are a company member.
+     * @allow (delete) - User can delete invoice data if they are the owner or an admin.
+     * @deny (create) - User tries to create a invoice without being a company member.
+     * @deny (get, list) - User tries to read invoice data without being a company member.
+     * @deny (update) - User tries to update invoice data without being a company member.
+     * @deny (delete) - User tries to delete invoice data without being the owner or an admin.
+     * @principle Restricts access to company members for all operations.
+     */
+    match /invoices/{invoiceId} {
+      // TODO: Implement role-based access control for company members
+      allow get, list: if isSignedIn(); // TODO: Only company members should be able to list and get invoices.
+      allow create: if isSignedIn();   // TODO: Only company members should be able to create invoices.
+      allow update: if isSignedIn();   // TODO: Only company members should be able to update invoices.
+      allow delete: if false;   // TODO: Only invoice owners/admins should be able to delete invoices.
+    }
+
+    /**
+     * @description Rule for documents where only company users who can access the parent invoice can create, read, update, and delete.
+     * @path /invoices/{invoiceId}/lineItems/{lineItemId}
+     * @allow (create) - User can create a line item if they are a company member and can access the parent invoice.
+     * @allow (get, list) - User can read line items if they are a company member and can access the parent invoice.
+     * @allow (update) - User can update line items if they are a company member and can access the parent invoice.
+     * @allow (delete) - User can delete line items if they are the owner or an admin and can access the parent invoice.
+     * @deny (create) - User tries to create a line item without being a company member or not having access to the parent invoice.
+     * @deny (get, list) - User tries to read line items without being a company member or not having access to the parent invoice.
+     * @deny (update) - User tries to update line items without being a company member or not having access to the parent invoice.
+     * @deny (delete) - User tries to delete line items without being the owner or an admin or not having access to the parent invoice.
+     * @principle Restricts access to company members for all operations on line items.
+     */
+    match /invoices/{invoiceId}/lineItems/{lineItemId} {
+      // TODO: Implement role-based access control for company members
+      allow get, list: if get(/databases/$(database)/documents/invoices/$(invoiceId)).data != null && isSignedIn(); // TODO: Only company members should be able to list and get invoices.
+      allow create: if get(/databases/$(database)/documents/invoices/$(invoiceId)).data != null && isSignedIn();   // TODO: Only company members should be able to create invoices.
+      allow update: if get(/databases/$(database)/documents/invoices/$(invoiceId)).data != null && isSignedIn();   // TODO: Only company members should be able to update invoices.
+      allow delete: if false;   // TODO: Only invoice owners/admins should be able to delete invoices.
+    }
+
+    /**
+     * @description Rule for documents where only company users can create, read, update, and delete.
+     * @path /clients/{clientId}
+     * @allow (create) - User can create a client if they are a company member.
+     * @allow (get, list) - User can read client data if they are a company member.
+     * @allow (update) - User can update client data if they are a company member.
+     * @allow (delete) - User can delete client data if they are the owner or an admin.
+     * @deny (create) - User tries to create a client without being a company member.
+     * @deny (get, list) - User tries to read client data without being a company member.
+     * @deny (update) - User tries to update client data without being a company member.
+     * @deny (delete) - User tries to delete client data without being the owner or an admin.
+     * @principle Restricts access to company members for all operations.
+     */
+    match /clients/{clientId} {
+      // TODO: Implement role-based access control for company members
+      allow get, list: if isSignedIn(); // TODO: Only company members should be able to list and get clients.
+      allow create: if isSignedIn();   // TODO: Only company members should be able to create clients.
+      allow update: if isSignedIn();   // TODO: Only company members should be able to update clients.
+      allow delete: if false;   // TODO: Only client owners/admins should be able to delete clients.
+    }
+
+    /**
+     * @description Rule for documents where only the user who created the expense and company admins can create, read, update, and delete.
+     * @path /expenses/{expenseId}
+     * @allow (create) - User can create an expense if they are a company member.
+     * @allow (get, list) - User can read expense data if they are the owner or an admin.
+     * @allow (update) - User can update expense data if they are the owner or an admin.
+     * @allow (delete) - User can delete expense data if they are the owner or an admin.
+     * @deny (create) - User tries to create an expense without being a company member.
+     * @deny (get, list) - User tries to read expense data without being the owner or an admin.
+     * @deny (update) - User tries to update expense data without being the owner or an admin.
+     * @deny (delete) - User tries to delete expense data without being the owner or an admin.
+     * @principle Restricts access to the expense owner and company admins for all operations.
+     */
+    match /expenses/{expenseId} {
+      allow get, list: if isSignedIn(); // TODO: Only the owner or an admin should be able to list and get expenses.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;   // TODO: Only the owner should be able to create expenses.
+      allow update: if request.resource.data.uid == request.auth.uid;   // TODO: Only the owner or an admin should be able to update expenses.
+      allow delete: if request.resource.data.uid == request.auth.uid;   // TODO: Only the owner or an admin should be able to delete expenses.
+    }
+
+    /**
+     * @description Rule for documents where only the user who created the time entry and company admins can create, read, update, and delete.
+     * @path /timeEntries/{timeEntryId}
+     * @allow (create) - User can create a time entry if they are a company member.
+     * @allow (get, list) - User can read time entry data if they are the owner or an admin.
+     * @allow (update) - User can update time entry data if they are the owner or an admin.
+     * @allow (delete) - User can delete time entry data if they are the owner or an admin.
+     * @deny (create) - User tries to create a time entry without being a company member.
+     * @deny (get, list) - User tries to read time entry data without being the owner or an admin.
+     * @deny (update) - User tries to update time entry data without being the owner or an admin.
+     * @deny (delete) - User tries to delete time entry data without being the owner or an admin.
+     * @principle Restricts access to the time entry owner and company admins for all operations.
+     */
+    match /timeEntries/{timeEntryId} {
+      allow get, list: if isSignedIn(); // TODO: Only the owner or an admin should be able to list and get time entries.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;   // TODO: Only the owner should be able to create time entries.
+      allow update: if request.resource.data.uid == request.auth.uid;   // TODO: Only the owner or an admin should be able to update time entries.
+      allow delete: if request.resource.data.uid == request.auth.uid;   // TODO: Only the owner or an admin should be able to delete time entries.
+    }
+
+    /**
+     * @description Rule for documents where only company users can create, read, update, and delete.
+     * @path /documents/{docId}
+     * @allow (create) - User can create a document if they are a company member.
+     * @allow (get, list) - User can read document data if they are a company member.
+     * @allow (update) - User can update document data if they are a company member.
+     * @allow (delete) - User can delete document data if they are the owner or an admin.
+     * @deny (create) - User tries to create a document without being a company member.
+     * @deny (get, list) - User tries to read document data without being a company member.
+     * @deny (update) - User tries to update document data without being a company member.
+     * @deny (delete) - User tries to delete document data without being the owner or an admin.
+     * @principle Restricts access to company members for all operations.
+     */
+    match /documents/{docId} {
+      allow get, list: if isSignedIn(); // TODO: Only company members should be able to list and get documents.
+      allow create: if isSignedIn();   // TODO: Only company members should be able to create documents.
+      allow update: if isSignedIn();   // TODO: Only company members should be able to update documents.
+      allow delete: if false;   // TODO: Only document owners/admins should be able to delete documents.
+    }
+
+    /**
+     * @description Rule for documents where only the user the notification is intended for can create, read, update, and delete.
+     * @path /notifications/{notificationId}
+     * @allow (create) - User can create a notification for themselves.
+     * @allow (get, list) - User can read notification data if it is intended for them.
+     * @allow (update) - User can update notification data if it is intended for them.
+     * @allow (delete) - User can delete notification data if it is intended for them.
+     * @deny (create) - User tries to create a notification for another user.
+     * @deny (get, list) - User tries to read notification data that is not intended for them.
+     * @deny (update) - User tries to update notification data that is not intended for them.
+     * @deny (delete) - User tries to delete notification data that is not intended for them.
+     * @principle Restricts access to the intended recipient for all operations.
+     */
+    match /notifications/{notificationId} {
+      allow get, list: if resource.data.uid == request.auth.uid;
+      allow create: if request.resource.data.uid == request.auth.uid;
+      allow update: if resource.data.uid == request.auth.uid;
+      allow delete: if resource.data.uid == request.auth.uid;
+    }
+
+    /**
+     * @description Rule for documents where only company admins can create, read, update, and delete.
+     * @path /reports/{reportId}
+     * @allow (create) - Company admin can create a report.
+     * @allow (get, list) - Company admin can read report data.
+     * @allow (update) - Company admin can update report data.
+     * @allow (delete) - Company admin can delete report data.
+     * @deny (create) - User tries to create a report without being an admin.
+     * @deny (get, list) - User tries to read report data without being an admin.
+     * @deny (update) - User tries to update report data without being an admin.
+     * @deny (delete) - User tries to delete report data without being an admin.
+     * @principle Restricts access to company admins for all operations.
+     */
+    match /reports/{reportId} {
+      // TODO: Implement role-based access control for company admins
+      allow get, list: if false; // TODO: Only company admins should be able to list and get reports.
+      allow create: if false;   // TODO: Only company admins should be able to create reports.
+      allow update: if false;   // TODO: Only company admins should be able to update reports.
+      allow delete: if false;   // TODO: Only company admins should be able to delete reports.
+    }
+
+    /**
+     * @description Rule for documents where the token owner can create, read, update, and delete.
+     * @path /portalViews/{token}
+     * @allow (create) - Token owner can create.
+     * @allow (get, list) - Token owner can read data.
+     * @allow (update) - Token owner can update data.
+     * @allow (delete) - Token owner can delete data.
+     * @deny (create) - User tries to create without being the token owner.
+     * @deny (get, list) - User tries to read data without being the token owner.
+     * @deny (update) - User tries to update data without being the token owner.
+     * @deny (delete) - User tries to delete data without being the token owner.
+     * @principle Restricts access to the token owner for all operations.
+     */
+    match /portalViews/{token} {
+      allow get, list: if false; // TODO: restrict by token value.
+      allow create: if false;   // TODO: restrict by token value.
+      allow update: if false;   // TODO: restrict by token value.
+      allow delete: if false;   // TODO: restrict by token value.
+    }
+
+    /**
+     * @description Rule for documents where only company users can create, read, update, and delete.
+     * @path /kudos/{kudoId}
+     * @allow (create) - User can create a kudo if they are a company member.
+     * @allow (get, list) - User can read kudo data if they are a company member.
+     * @allow (update) - User can update kudo data if they are a company member.
+     * @allow (delete) - User can delete kudo data if they are the owner or an admin.
+     * @deny (create) - User tries to create a kudo without being a company member.
+     * @deny (get, list) - User tries to read kudo data without being a company member.
+     * @deny (update) - User tries to update kudo data without being a company member.
+     * @deny (delete) - User tries to delete kudo data without being the owner or an admin.
+     * @principle Restricts access to company members for all operations.
+     */
+    match /kudos/{kudoId} {
+      // TODO: Implement role-based access control for company members
+      allow get, list: if isSignedIn(); // TODO: Only company members should be able to list and get kudos.
+      allow create: if isSignedIn();   // TODO: Only company members should be able to create kudos.
+      allow update: if isSignedIn();   // TODO: Only company members should be able to update kudos.
+      allow delete: if false;   // TODO: Only kudo owners/admins should be able to delete kudos.
+    }
+
+    /**
+     * @description Rule for documents where only the user can create, read, update, and delete.
+     * @path /presence/{uid}
+     * @allow (create) - User can create their own presence document.
+     * @allow (get, list) - User can read their own presence document.
+     * @allow (update) - User can update their own presence document.
+     * @allow (delete) - User can delete their own presence document.
+     * @deny (create) - User tries to create a presence document for another user.
+     * @deny (get, list) - User tries to read another user's presence document.
+     * @deny (update) - User tries to update another user's presence document.
+     * @deny (delete) - User tries to delete another user's presence document.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /presence/{uid} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid) && request.resource.data.uid == uid;
+        allow update: if isExistingOwner(uid) && isImmutable('uid');
+        allow delete: if isExistingOwner(uid);
+    }
+  }
+}

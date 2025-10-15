@@ -1,0 +1,1149 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user within the Huddle application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile photo.",
+          "format": "uri"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role within the company (admin, user, client)."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N User)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the user was created.",
+          "format": "date-time"
+        },
+        "lastSeenAt": {
+          "type": "string",
+          "description": "Timestamp of when the user was last seen online.",
+          "format": "date-time"
+        },
+        "level": {
+          "type": "number",
+          "description": "The user's current level."
+        },
+        "xp": {
+          "type": "number",
+          "description": "The user's current experience points."
+        }
+      },
+      "required": [
+        "id",
+        "displayName",
+        "email",
+        "role",
+        "companyId",
+        "createdAt"
+      ]
+    },
+    "Company": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Company",
+      "type": "object",
+      "description": "Represents a company using the Huddle application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the company entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the company."
+        },
+        "ownerUid": {
+          "type": "string",
+          "description": "Reference to User who owns the company. (Relationship: User 1:N Company)"
+        },
+        "plan": {
+          "type": "string",
+          "description": "The company's subscription plan (core, pro, business)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the company was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "ownerUid",
+        "plan",
+        "createdAt"
+      ]
+    },
+    "Channel": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Channel",
+      "type": "object",
+      "description": "Represents a communication channel within a company.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the channel entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Channel)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the channel."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The type of channel (team, project, dm)."
+        },
+        "members": {
+          "type": "array",
+          "description": "Array of user IDs that are members of the channel.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N Channel). Nullable."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the channel was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "name",
+        "kind",
+        "members",
+        "createdAt"
+      ]
+    },
+    "Message": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Message",
+      "type": "object",
+      "description": "Represents a message within a communication channel.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message entity."
+        },
+        "channelId": {
+          "type": "string",
+          "description": "Reference to Channel. (Relationship: Channel 1:N Message)"
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Message)"
+        },
+        "fromUid": {
+          "type": "string",
+          "description": "Reference to User who sent the message. (Relationship: User 1:N Message)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The content of the message."
+        },
+        "embeds": {
+          "type": "string",
+          "description": "Smart embeds for task/invoice/client links. Nullable."
+        },
+        "threadRootId": {
+          "type": "string",
+          "description": "Reference to Message. (Relationship: Message 1:N Message). Nullable."
+        },
+        "reactions": {
+          "type": "string",
+          "description": "Map of emoji reactions and the number of times each was used."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the message was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "channelId",
+        "companyId",
+        "fromUid",
+        "text",
+        "createdAt"
+      ]
+    },
+    "Project": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Project",
+      "type": "object",
+      "description": "Represents a project within a company.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the project entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Project)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the project."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the project."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the project (active, archived)."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Reference to User who created the project. (Relationship: User 1:N Project)"
+        },
+        "members": {
+          "type": "array",
+          "description": "Array of user IDs that are members of the project.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the project was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "name",
+        "description",
+        "status",
+        "createdBy",
+        "members",
+        "createdAt"
+      ]
+    },
+    "Task": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Task",
+      "type": "object",
+      "description": "Represents a task within a project.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the task entity."
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N Task)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the task."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the task."
+        },
+        "assignee": {
+          "type": "string",
+          "description": "Reference to User assigned to the task. (Relationship: User 1:N Task)"
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The due date of the task.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the task (todo, in_progress, done)."
+        },
+        "percentComplete": {
+          "type": "number",
+          "description": "The percentage of the task that is complete."
+        },
+        "order": {
+          "type": "number",
+          "description": "The order of the task within the project."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Task)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the task was created.",
+          "format": "date-time"
+        },
+        "suggestions": {
+          "type": "string",
+          "description": "AI suggested next step. Nullable."
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "title",
+        "description",
+        "assignee",
+        "dueDate",
+        "status",
+        "percentComplete",
+        "order",
+        "companyId",
+        "createdAt"
+      ]
+    },
+    "Invoice": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Invoice",
+      "type": "object",
+      "description": "Represents an invoice.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the invoice entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Invoice)"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Reference to Client. (Relationship: Client 1:N Invoice)"
+        },
+        "number": {
+          "type": "string",
+          "description": "The invoice number."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the invoice (draft, sent, paid, overdue)."
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "The subtotal amount of the invoice."
+        },
+        "tax": {
+          "type": "number",
+          "description": "The tax amount of the invoice."
+        },
+        "total": {
+          "type": "number",
+          "description": "The total amount of the invoice."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the invoice."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The due date of the invoice.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the invoice was created.",
+          "format": "date-time"
+        },
+        "repeatMonthly": {
+          "type": "boolean",
+          "description": "Whether the invoice should repeat monthly."
+        },
+        "lastGeneratedAt": {
+          "type": "string",
+          "description": "Timestamp of when the invoice was last generated.",
+          "format": "date-time"
+        },
+        "payLink": {
+          "type": "string",
+          "description": "The payment link for the invoice."
+        },
+        "portalToken": {
+          "type": "string",
+          "description": "Token for read-only client view"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "clientId",
+        "number",
+        "status",
+        "subtotal",
+        "tax",
+        "total",
+        "currency",
+        "dueDate",
+        "createdAt",
+        "repeatMonthly"
+      ]
+    },
+    "LineItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LineItem",
+      "type": "object",
+      "description": "Represents a line item within an invoice.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the line item entity."
+        },
+        "invoiceId": {
+          "type": "string",
+          "description": "Reference to Invoice. (Relationship: Invoice 1:N LineItem)"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the line item."
+        },
+        "qty": {
+          "type": "number",
+          "description": "The quantity of the line item."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "The unit price of the line item."
+        }
+      },
+      "required": [
+        "id",
+        "invoiceId",
+        "description",
+        "qty",
+        "unitPrice"
+      ]
+    },
+    "Client": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Client",
+      "type": "object",
+      "description": "Represents a client.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the client entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Client)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the client."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the client.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the client."
+        },
+        "website": {
+          "type": "string",
+          "description": "The website of the client.",
+          "format": "uri"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes about the client."
+        },
+        "dealValue": {
+          "type": "number",
+          "description": "The value of the deal with the client."
+        },
+        "lastContactAt": {
+          "type": "string",
+          "description": "Timestamp of when the client was last contacted.",
+          "format": "date-time"
+        },
+        "aiReminderEnabled": {
+          "type": "boolean",
+          "description": "Whether AI reminders are enabled for the client."
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "name",
+        "email"
+      ]
+    },
+    "Expense": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Expense",
+      "type": "object",
+      "description": "Represents an expense.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the expense entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Expense)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User who created the expense. (Relationship: User 1:N Expense)"
+        },
+        "vendor": {
+          "type": "string",
+          "description": "The vendor of the expense."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the expense.",
+          "format": "date-time"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of the expense."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the expense."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the expense."
+        },
+        "imagePath": {
+          "type": "string",
+          "description": "The path to the image of the expense receipt. Nullable."
+        },
+        "ocrRaw": {
+          "type": "string",
+          "description": "The raw OCR text from the expense receipt. Nullable."
+        },
+        "aiCategoryGuess": {
+          "type": "string",
+          "description": "The AI's guess of the expense category. Nullable."
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "userId",
+        "vendor",
+        "date",
+        "amount",
+        "currency",
+        "category"
+      ]
+    },
+    "TimeEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TimeEntry",
+      "type": "object",
+      "description": "Represents a time entry.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the time entry entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N TimeEntry)"
+        },
+        "projectId": {
+          "type": "string",
+          "description": "Reference to Project. (Relationship: Project 1:N TimeEntry)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User who created the time entry. (Relationship: User 1:N TimeEntry)"
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Timestamp of when the time entry was started.",
+          "format": "date-time"
+        },
+        "stoppedAt": {
+          "type": "string",
+          "description": "Timestamp of when the time entry was stopped.",
+          "format": "date-time"
+        },
+        "durationSec": {
+          "type": "number",
+          "description": "The duration of the time entry in seconds. Nullable."
+        },
+        "billableRate": {
+          "type": "number",
+          "description": "The billable rate for the time entry. Nullable."
+        },
+        "note": {
+          "type": "string",
+          "description": "A note about the time entry."
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "projectId",
+        "userId",
+        "startedAt"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Represents a document.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the document entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Document)"
+        },
+        "uploadedBy": {
+          "type": "string",
+          "description": "Reference to User who uploaded the document. (Relationship: User 1:N Document)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the document."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of the document (pdf, image, doc, other)."
+        },
+        "storagePath": {
+          "type": "string",
+          "description": "The path to the document in storage."
+        },
+        "summary": {
+          "type": "string",
+          "description": "A summary of the document generated by AI. Nullable."
+        },
+        "bullets": {
+          "type": "array",
+          "description": "Bullet points extracted from the document by AI. Nullable.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the document was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "uploadedBy",
+        "name",
+        "type",
+        "storagePath",
+        "createdAt"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notification entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Notification)"
+        },
+        "uid": {
+          "type": "string",
+          "description": "Reference to User who receives the notification. (Relationship: User 1:N Notification)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of notification (invoice, task, crm, system)."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the notification."
+        },
+        "body": {
+          "type": "string",
+          "description": "The body of the notification."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Whether the notification has been read."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the notification was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "uid",
+        "type",
+        "title",
+        "body",
+        "read",
+        "createdAt"
+      ]
+    },
+    "Report": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Report",
+      "type": "object",
+      "description": "Represents a report.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the report entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Report)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of report (daily, weekly)."
+        },
+        "payload": {
+          "type": "string",
+          "description": "The payload of the report. Can contain SWI data, etc.."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the report was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "type",
+        "payload",
+        "createdAt"
+      ]
+    },
+    "PortalView": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PortalView",
+      "type": "object",
+      "description": "Represents a portal view.",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Unique identifier for the portal view entity."
+        },
+        "invoiceId": {
+          "type": "string",
+          "description": "Reference to Invoice being viewed. (Relationship: Invoice 1:N PortalView)"
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "Timestamp of when the portal view expires.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "token",
+        "invoiceId"
+      ]
+    },
+    "Kudo": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Kudo",
+      "type": "object",
+      "description": "Represents a kudo.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the kudo entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Kudo)"
+        },
+        "fromUid": {
+          "type": "string",
+          "description": "Reference to User who sent the kudo. (Relationship: User 1:N Kudo)"
+        },
+        "toUid": {
+          "type": "string",
+          "description": "Reference to User who received the kudo. (Relationship: User 1:N Kudo)"
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason for the kudo (smart_move, assist, automation)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the kudo was created.",
+          "format": "date-time"
+        },
+        "weight": {
+          "type": "number",
+          "description": "The weight of the kudo."
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "fromUid",
+        "toUid",
+        "reason",
+        "createdAt",
+        "weight"
+      ]
+    },
+    "Presence": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Presence",
+      "type": "object",
+      "description": "Represents a user's presence.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique identifier for the presence entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to Company. (Relationship: Company 1:N Presence)"
+        },
+        "lastSeenAt": {
+          "type": "string",
+          "description": "Timestamp of when the user was"
+        }
+      }
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{uid}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Uses path-based ownership; access is restricted to the user and admins within the same company.",
+          "params": [
+            {
+              "name": "uid",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/companies/{companyId}",
+        "definition": {
+          "entityName": "Company",
+          "schema": {
+            "$ref": "#/backend/entities/Company"
+          },
+          "description": "Stores company information. Access is restricted to company admins.",
+          "params": [
+            {
+              "name": "companyId",
+              "description": "The unique identifier of the company."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/channels/{channelId}",
+        "definition": {
+          "entityName": "Channel",
+          "schema": {
+            "$ref": "#/backend/entities/Channel"
+          },
+          "description": "Stores channel information. Includes denormalized 'members' list for authorization independence. Access is restricted to members of the channel within the company.",
+          "params": [
+            {
+              "name": "channelId",
+              "description": "The unique identifier of the channel."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/channels/{channelId}/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": {
+            "$ref": "#/backend/entities/Message"
+          },
+          "description": "Stores messages within a channel. Access is restricted to members of the channel within the company.  Denormalizes `companyId` from parent channel.",
+          "params": [
+            {
+              "name": "channelId",
+              "description": "The unique identifier of the channel."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique identifier of the message."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores project information. Access is restricted to project members within the company.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/projects/{projectId}/tasks/{taskId}",
+        "definition": {
+          "entityName": "Task",
+          "schema": {
+            "$ref": "#/backend/entities/Task"
+          },
+          "description": "Stores tasks within a project. Access is restricted to project members and the assigned user, within the company. Denormalizes `companyId` from parent project. Task can be written to by the assignee of the task.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique identifier of the task."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/invoices/{invoiceId}",
+        "definition": {
+          "entityName": "Invoice",
+          "schema": {
+            "$ref": "#/backend/entities/Invoice"
+          },
+          "description": "Stores invoice information. Access is restricted to company users.",
+          "params": [
+            {
+              "name": "invoiceId",
+              "description": "The unique identifier of the invoice."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/invoices/{invoiceId}/lineItems/{lineItemId}",
+        "definition": {
+          "entityName": "LineItem",
+          "schema": {
+            "$ref": "#/backend/entities/LineItem"
+          },
+          "description": "Stores line items within an invoice. Access is restricted to company users who can access the parent invoice.",
+          "params": [
+            {
+              "name": "invoiceId",
+              "description": "The unique identifier of the invoice."
+            },
+            {
+              "name": "lineItemId",
+              "description": "The unique identifier of the line item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/clients/{clientId}",
+        "definition": {
+          "entityName": "Client",
+          "schema": {
+            "$ref": "#/backend/entities/Client"
+          },
+          "description": "Stores client information. Access is restricted to company users.",
+          "params": [
+            {
+              "name": "clientId",
+              "description": "The unique identifier of the client."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/expenses/{expenseId}",
+        "definition": {
+          "entityName": "Expense",
+          "schema": {
+            "$ref": "#/backend/entities/Expense"
+          },
+          "description": "Stores expense information.  Access is restricted to the user who created the expense and company admins.",
+          "params": [
+            {
+              "name": "expenseId",
+              "description": "The unique identifier of the expense."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/timeEntries/{timeEntryId}",
+        "definition": {
+          "entityName": "TimeEntry",
+          "schema": {
+            "$ref": "#/backend/entities/TimeEntry"
+          },
+          "description": "Stores time entry information. Access is restricted to the user who created the time entry and company admins.",
+          "params": [
+            {
+              "name": "timeEntryId",
+              "description": "The unique identifier of the time entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/documents/{docId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Stores document information. Access is restricted to company users.",
+          "params": [
+            {
+              "name": "docId",
+              "description": "The unique identifier of the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notification information. Access is restricted to the user the notification is intended for.",
+          "params": [
+            {
+              "name": "notificationId",
+              "description": "The unique identifier of the notification."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/reports/{reportId}",
+        "definition": {
+          "entityName": "Report",
+          "schema": {
+            "$ref": "#/backend/entities/Report"
+          },
+          "description": "Stores report information. Access is restricted to company admins.",
+          "params": [
+            {
+              "name": "reportId",
+              "description": "The unique identifier of the report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/portalViews/{token}",
+        "definition": {
+          "entityName": "PortalView",
+          "schema": {
+            "$ref": "#/backend/entities/PortalView"
+          },
+          "description": "Stores portal view information.",
+          "params": [
+            {
+              "name": "token",
+              "description": "The unique token for the portal view."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/kudos/{kudoId}",
+        "definition": {
+          "entityName": "Kudo",
+          "schema": {
+            "$ref": "#/backend/entities/Kudo"
+          },
+          "description": "Stores kudo information. Access is restricted to company users.",
+          "params": [
+            {
+              "name": "kudoId",
+              "description": "The unique identifier of the kudo."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/presence/{uid}",
+        "definition": {
+          "entityName": "Presence",
+          "schema": {
+            "$ref": "#/backend/entities/Presence"
+          },
+          "description": "Stores user presence information. Uses path-based ownership; access is restricted to the user and admins within the same company.",
+          "params": [
+            {
+              "name": "uid",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to provide a secure and scalable foundation for the Huddle application, adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. This design avoids hierarchical authorization dependencies by denormalizing authorization context, enabling atomic operations and simplifying security rules. Segregation ensures that collections have a homogeneous security posture, while access modeling provides consistency.\n\n**Authorization Independence (Denormalization):**\n*   `Channels` and `Messages`: The `members` list in the `Channel` document is denormalized.  This ensures that message creation rules can validate membership without needing to `get()` the channel document. The `companyId` is present in `Channels` and `Messages` to enforce company-level access. Further more, `companyId` is present in every document to prevent cross-company reads/writes.\n*   `Projects` and `Tasks`: The `members` list in the `Project` document is denormalized into `Task` documents. Along with `companyId`, this ensures that task rules can validate membership without needing to `get()` the project document. The `assignee` field in the Task document allows direct assignment and simplifies write rules for the assigned user. The `companyId` is present in `Projects` and `Tasks` to enforce company-level access.\n*   `Notifications`: Each notification includes the `uid` of the user who should receive it, eliminating the need to query based on recipient. This enables efficient and secure delivery of notifications.\n\n**Structural Segregation:**\n*   User-owned data such as `Expenses`, `TimeEntries`, and `Documents` are stored under the `/companies/{companyId}/{entityName}/{entityId}` collection, simplifying ownership-based rules.\n\n**Access Modeling:**\n*   Path-Based Ownership: Private data like user profiles (`/users/{uid}`) and presence (`/presence/{uid}`) are organized using path-based ownership for simplified access control.\n*   Membership Map: The `members` array field on `Channel` documents enables collaborative access, allowing users within a company to be granted access to specific channels.\n\n**QAPs (Rules are not Filters):**\n*   The data structure supports secure `list` operations by ensuring all documents within a collection share the same security requirements.  The segregation of data by company and user roles (`admin`, `user`, `client`) enforces these requirements.\n\nThis structure prioritizes security and debuggability by making authorization intent clear and explicit. The denormalization strategy ensures atomic operations are possible and avoids complex rule logic."
+  }
+}
