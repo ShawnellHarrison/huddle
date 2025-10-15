@@ -1,8 +1,24 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { HuddleLogo } from '@/components/huddle-logo';
 import { cn } from '@/lib/utils';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
 
 function GoogleIcon() {
     return (
@@ -15,7 +31,42 @@ function GoogleIcon() {
     )
 }
 
+const formSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address.' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
+});
+
 export default function LoginPage() {
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/');
+    }
+  }, [user, isUserLoading, router]);
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    initiateEmailSignIn(auth, values.email, values.password);
+  }
+  
+  if (isUserLoading || user) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <HuddleLogo className="text-2xl animate-pulse" />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-sm">
       <div className="cozy-panel p-8 flex flex-col items-center text-center space-y-6">
@@ -25,19 +76,39 @@ export default function LoginPage() {
             <p className="text-muted-foreground">Your business partner in your pocket awaits.</p>
         </div>
 
-        <div className="w-full space-y-4">
-            <div className="space-y-2 text-left">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@company.com" className="input" />
-            </div>
-            <div className="space-y-2 text-left">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="••••••••" className="input" />
-            </div>
-        </div>
-
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="text-left">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="you@company.com" {...field} className="input" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="text-left">
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} className="input" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className={cn('w-full btn btn-primary')}>Sign In</Button>
+          </form>
+        </Form>
+        
         <div className="w-full flex flex-col space-y-3">
-            <Button className={cn('w-full btn btn-primary')}>Sign In</Button>
             <Button variant="outline" className="w-full btn">
                 <GoogleIcon />
                 <span>Sign in with Google</span>

@@ -1,3 +1,4 @@
+
 "use client"
 import Link from 'next/link';
 import {
@@ -12,8 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from '@/lib/types';
-import { LogOut, Settings, User as UserIcon } from 'lucide-react';
+import { Settings, User as UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/firebase';
+import { getAuth } from 'firebase/auth';
 
 interface UserNavProps {
   user: User;
@@ -32,33 +35,48 @@ const levelColor: { [key in User['levelName']]: string } = {
   platinum: 'text-[#e5e4e2]',
 }
 
-export function UserNav({ user }: UserNavProps) {
+export function UserNav({ user: mockUser }: UserNavProps) {
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+  
+  // Combine mock data with auth user data for display
+  const displayUser = {
+    ...mockUser,
+    displayName: user.displayName || mockUser.displayName,
+    email: user.email || mockUser.email,
+    photoURL: user.photoURL || mockUser.photoURL,
+  };
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-auto w-full justify-start p-2 gap-2">
             <div className="relative">
               <Avatar className="h-9 w-9">
-                <AvatarImage src={user.photoURL} alt={user.displayName} />
-                <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
+                <AvatarImage src={displayUser.photoURL} alt={displayUser.displayName} />
+                <AvatarFallback>{displayUser.displayName.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className={cn(
                 "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-sidebar-background",
-                statusIndicator[user.status]
+                statusIndicator[displayUser.status]
               )} />
             </div>
             <div className="flex flex-col items-start text-left group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">{user.displayName}</span>
-              <span className="text-xs text-muted-foreground capitalize">{user.role}</span>
+              <span className="text-sm font-medium">{displayUser.displayName}</span>
+              <span className="text-xs text-muted-foreground capitalize">{displayUser.role}</span>
             </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-2">
-            <p className="text-sm font-medium leading-none">{user.displayName}</p>
+            <p className="text-sm font-medium leading-none">{displayUser.displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {displayUser.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -66,13 +84,13 @@ export function UserNav({ user }: UserNavProps) {
         <DropdownMenuGroup>
           <div className="px-2 py-1.5 text-xs">
             <div className="flex justify-between items-center mb-1">
-              <span className={cn("font-bold capitalize", levelColor[user.levelName])}>
-                Level {user.level} - {user.levelName}
+              <span className={cn("font-bold capitalize", levelColor[displayUser.levelName])}>
+                Level {displayUser.level} - {displayUser.levelName}
               </span>
-              <span className="text-muted-foreground">{user.xp} / 1000 XP</span>
+              <span className="text-muted-foreground">{displayUser.xp} / 1000 XP</span>
             </div>
             <div className="xp-outer">
-              <div className="xp-inner rounded-full" style={{ width: `${(user.xp / 1000) * 100}%` }} />
+              <div className="xp-inner rounded-full" style={{ width: `${(displayUser.xp / 1000) * 100}%` }} />
             </div>
           </div>
         </DropdownMenuGroup>
@@ -89,11 +107,6 @@ export function UserNav({ user }: UserNavProps) {
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

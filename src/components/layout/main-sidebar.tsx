@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from 'next/link';
@@ -29,11 +30,14 @@ import {
   Puzzle,
   Plus,
   Radio,
+  LogOut,
 } from 'lucide-react';
 import { channels, directMessages, users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { UserNav } from '../user-nav';
+import { useUser } from '@/firebase';
+import { getAuth } from 'firebase/auth';
 
 const mainNav = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -50,7 +54,30 @@ const mainNav = [
 
 export function MainSidebar() {
   const pathname = usePathname();
-  const currentUser = users[0];
+  const { user, isUserLoading } = useUser();
+  const currentUser = users[0]; // Replace with authenticated user
+
+  const handleLogout = () => {
+    const auth = getAuth();
+    auth.signOut();
+  }
+
+  if (isUserLoading) {
+    return (
+      <Sidebar>
+        <SidebarHeader>
+          <HuddleLogo />
+        </SidebarHeader>
+        <SidebarContent className="p-2">
+          {/* You can add a skeleton loader here */}
+        </SidebarContent>
+      </Sidebar>
+    )
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <Sidebar>
@@ -82,10 +109,10 @@ export function MainSidebar() {
                   tooltip={item.label}
                   asChild
                 >
-                  <>
+                  
                     <item.icon />
                     <span>{item.label}</span>
-                  </>
+                  
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -158,6 +185,14 @@ export function MainSidebar() {
       <SidebarSeparator />
       <SidebarFooter>
         <UserNav user={currentUser} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} className="w-full">
+              <LogOut />
+              <span>Log out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
