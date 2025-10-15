@@ -82,8 +82,10 @@ export function MainSidebar() {
                   tooltip={item.label}
                   asChild
                 >
-                  <item.icon />
-                  <span>{item.label}</span>
+                  <>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -105,10 +107,12 @@ export function MainSidebar() {
                       size="sm"
                       asChild
                     >
-                      <span className="truncate"># {channel.name}</span>
-                      {channel.unreadCount && channel.unreadCount > 0 && (
-                         <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-xs font-bold text-brand">{channel.unreadCount}</span>
-                      )}
+                      <>
+                        <span className="truncate"># {channel.name}</span>
+                        {channel.unreadCount && channel.unreadCount > 0 && (
+                           <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-xs font-bold text-brand">{channel.unreadCount}</span>
+                        )}
+                      </>
                    </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -133,14 +137,16 @@ export function MainSidebar() {
                       size="sm"
                       asChild
                     >
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage src={otherUser.photoURL} alt={otherUser.displayName} data-ai-hint="person face" />
-                        <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="truncate">{otherUser.displayName}</span>
-                      {dm.unreadCount && dm.unreadCount > 0 && (
-                         <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-xs font-bold text-brand">{dm.unreadCount}</span>
-                      )}
+                      <>
+                        <Avatar className="h-5 w-5">
+                          <AvatarImage src={otherUser.photoURL} alt={otherUser.displayName} data-ai-hint="person face" />
+                          <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="truncate">{otherUser.displayName}</span>
+                        {dm.unreadCount && dm.unreadCount > 0 && (
+                           <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-xs font-bold text-brand">{dm.unreadCount}</span>
+                        )}
+                      </>
                    </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
