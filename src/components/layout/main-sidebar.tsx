@@ -55,8 +55,7 @@ const mainNav = [
 export function MainSidebar() {
   const pathname = usePathname();
   const { user, isUserLoading } = useUser();
-  const currentUser = users[0]; // Replace with authenticated user
-
+  
   const handleLogout = () => {
     const auth = getAuth();
     auth.signOut();
@@ -78,6 +77,10 @@ export function MainSidebar() {
   if (!user) {
     return null;
   }
+  
+  // Find the full user profile from mock data using the authenticated user's UID
+  const currentUser = users.find(u => u.email === user.email) || users[0];
+  const otherUserForDM = users.find(u => u.uid !== currentUser.uid);
 
   return (
     <Sidebar>
@@ -184,7 +187,7 @@ export function MainSidebar() {
       </SidebarContent>
       <SidebarSeparator />
       <SidebarFooter>
-        <UserNav user={currentUser} />
+        <UserNav />
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} className="w-full">

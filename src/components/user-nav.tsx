@@ -16,11 +16,7 @@ import { User } from '@/lib/types';
 import { Settings, User as UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/firebase';
-import { getAuth } from 'firebase/auth';
-
-interface UserNavProps {
-  user: User;
-}
+import { users } from '@/lib/mock-data';
 
 const statusIndicator: { [key in User['status']]: string } = {
   online: 'bg-green-500',
@@ -35,21 +31,28 @@ const levelColor: { [key in User['levelName']]: string } = {
   platinum: 'text-[#e5e4e2]',
 }
 
-export function UserNav({ user: mockUser }: UserNavProps) {
+export function UserNav() {
   const { user } = useUser();
 
   if (!user) {
     return null;
   }
   
-  // Combine mock data with auth user data for display
-  const displayUser = {
-    ...mockUser,
-    displayName: user.displayName || mockUser.displayName,
-    email: user.email || mockUser.email,
-    photoURL: user.photoURL || mockUser.photoURL,
+  // Find the full user profile from mock data using the authenticated user's email
+  const currentUser = users.find(u => u.email === user.email) || {
+      uid: user.uid,
+      displayName: user.displayName || 'Anonymous',
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      role: 'user',
+      companyId: '',
+      createdAt: new Date(),
+      lastSeenAt: new Date(),
+      level: 1,
+      xp: 0,
+      levelName: 'bronze',
+      status: 'online',
   };
-
 
   return (
     <DropdownMenu>
@@ -57,26 +60,26 @@ export function UserNav({ user: mockUser }: UserNavProps) {
         <Button variant="ghost" className="relative h-auto w-full justify-start p-2 gap-2">
             <div className="relative">
               <Avatar className="h-9 w-9">
-                <AvatarImage src={displayUser.photoURL} alt={displayUser.displayName} />
-                <AvatarFallback>{displayUser.displayName.charAt(0)}</AvatarFallback>
+                <AvatarImage src={currentUser.photoURL} alt={currentUser.displayName} />
+                <AvatarFallback>{currentUser.displayName.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className={cn(
                 "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-sidebar-background",
-                statusIndicator[displayUser.status]
+                statusIndicator[currentUser.status]
               )} />
             </div>
             <div className="flex flex-col items-start text-left group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">{displayUser.displayName}</span>
-              <span className="text-xs text-muted-foreground capitalize">{displayUser.role}</span>
+              <span className="text-sm font-medium">{currentUser.displayName}</span>
+              <span className="text-xs text-muted-foreground capitalize">{currentUser.role}</span>
             </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-2">
-            <p className="text-sm font-medium leading-none">{displayUser.displayName}</p>
+            <p className="text-sm font-medium leading-none">{currentUser.displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {displayUser.email}
+              {currentUser.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -84,13 +87,13 @@ export function UserNav({ user: mockUser }: UserNavProps) {
         <DropdownMenuGroup>
           <div className="px-2 py-1.5 text-xs">
             <div className="flex justify-between items-center mb-1">
-              <span className={cn("font-bold capitalize", levelColor[displayUser.levelName])}>
-                Level {displayUser.level} - {displayUser.levelName}
+              <span className={cn("font-bold capitalize", levelColor[currentUser.levelName])}>
+                Level {currentUser.level} - {currentUser.levelName}
               </span>
-              <span className="text-muted-foreground">{displayUser.xp} / 1000 XP</span>
+              <span className="text-muted-foreground">{currentUser.xp} / 1000 XP</span>
             </div>
             <div className="xp-outer">
-              <div className="xp-inner rounded-full" style={{ width: `${(displayUser.xp / 1000) * 100}%` }} />
+              <div className="xp-inner rounded-full" style={{ width: `${(currentUser.xp / 1000) * 100}%` }} />
             </div>
           </div>
         </DropdownMenuGroup>
