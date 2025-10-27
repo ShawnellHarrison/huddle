@@ -31,6 +31,7 @@ import {
   Plus,
   Radio,
   LogOut,
+  Sparkles,
 } from 'lucide-react';
 import { channels, directMessages, users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,6 +50,7 @@ const mainNav = [
   { href: '/time', icon: Clock, label: 'Time' },
   { href: '/docs', icon: FileBox, label: 'Docs' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
+  { href: '/subscription', icon: Sparkles, label: 'Subscription'},
   { href: '/integrations', icon: Puzzle, label: 'Integrations' },
 ];
 
