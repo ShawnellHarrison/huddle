@@ -17,8 +17,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useAuth, useUser } from '@/firebase';
+import { GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -56,15 +56,29 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!auth) return;
-    // In a real scenario, you'd call a function like `sendSignInLinkToEmail`.
-    // We are using a placeholder here because passwordless sign-in requires more setup.
-    initiateEmailSignIn(auth, values.email, 'password'); // NOTE: Password is not used, but required by the function signature.
-    toast({
-        title: "Check your email",
-        description: `A sign-in link has been sent to ${values.email}.`,
-    });
+    
+    const actionCodeSettings = {
+        url: window.location.origin, // URL to redirect back to
+        handleCodeInApp: true,
+    };
+
+    try {
+        await sendSignInLinkToEmail(auth, values.email, actionCodeSettings);
+        window.localStorage.setItem('emailForSignIn', values.email);
+        toast({
+            title: "Check your email",
+            description: `A sign-in link has been sent to ${values.email}.`,
+        });
+    } catch (error: any) {
+        console.error("Email Sign-In Error", error);
+        toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: `Could not send sign-in link: ${error.message}`,
+        });
+    }
   }
 
   const handleGoogleSignIn = async () => {
@@ -75,6 +89,11 @@ export default function LoginPage() {
       // The onAuthStateChanged listener will handle the redirect.
     } catch (error) {
       console.error("Google Sign-In Error", error);
+       toast({
+            variant: "destructive",
+            title: "Google Sign-In Failed",
+            description: "Could not sign in with Google. Please try again.",
+        });
     }
   };
   
@@ -87,47 +106,49 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="cozy-panel p-8 flex flex-col items-center text-center space-y-6">
-        <HuddleLogo className="text-2xl"/>
-        <div className="space-y-2">
-            <h1 className="text-2xl font-headline font-bold">Welcome Back</h1>
-            <p className="text-muted-foreground">Your business partner in your pocket awaits.</p>
-        </div>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="w-full max-w-sm">
+        <div className="cozy-panel p-8 flex flex-col items-center text-center space-y-6">
+          <HuddleLogo className="text-2xl"/>
+          <div className="space-y-2">
+              <h1 className="text-2xl font-headline font-bold">Welcome Back</h1>
+              <p className="text-muted-foreground">Your business partner in your pocket awaits.</p>
+          </div>
 
-        <div className="w-full flex flex-col space-y-3">
-            <Button onClick={handleGoogleSignIn} variant="outline" className="w-full btn">
-                <GoogleIcon />
-                <span>Sign in with Google</span>
-            </Button>
-        </div>
-        
-        <div className="w-full text-center">
-          <p className="text-xs text-muted-foreground">Or sign in with email</p>
-        </div>
+          <div className="w-full flex flex-col space-y-3">
+              <Button onClick={handleGoogleSignIn} variant="outline" className="w-full btn">
+                  <GoogleIcon />
+                  <span>Sign in with Google</span>
+              </Button>
+          </div>
+          
+          <div className="w-full text-center">
+            <p className="text-xs text-muted-foreground">Or sign in with email</p>
+          </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem className="text-left">
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="you@company.com" {...field} className="input" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className={cn('w-full btn btn-primary')}>Send Sign-In Link</Button>
-          </form>
-        </Form>
-        
-        <p className="text-xs text-muted-foreground">
-          Don&apos;t have an account? <a href="#" className="underline hover:text-brand">Contact sales</a>
-        </p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="text-left">
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@company.com" {...field} className="input" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className={cn('w-full btn btn-primary')}>Send Sign-In Link</Button>
+            </form>
+          </Form>
+          
+          <p className="text-xs text-muted-foreground">
+            Don&apos;t have an account? <a href="#" className="underline hover:text-brand">Contact sales</a>
+          </p>
+        </div>
       </div>
     </div>
   );
