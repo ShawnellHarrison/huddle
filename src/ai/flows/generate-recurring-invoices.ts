@@ -12,7 +12,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import {
   collection,
   query,
@@ -71,7 +71,7 @@ const getRenewableInvoices = ai.defineTool(
         const nextGenerationDate = new Date(lastGenerated);
         nextGenerationDate.setMonth(nextGenerationDate.getMonth() + 1);
 
-        if (now >= nextGenerationDate) {
+        if (now.getTime() >= nextGenerationDate.getTime()) {
           renewableInvoices.push({ id: doc.id, ...invoice });
         }
       }
