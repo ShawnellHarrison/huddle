@@ -6,3 +6,4 @@ import '@/ai/flows/execute-slash-commands.ts';
 import '@/ai/flows/generate-weekly-report.ts';
 import '@/ai/flows/categorize-expenses.ts';
 import '@/ai/flows/summarize-document.ts';
+import '@/ai/flows/generate-recurring-invoices.ts';
