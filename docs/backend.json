@@ -49,6 +49,23 @@
         "xp": {
           "type": "number",
           "description": "The user's current experience points."
+        },
+        "isPremium": {
+          "type": "boolean",
+          "description": "Indicates if the user has an active premium subscription."
+        },
+        "plan": {
+          "type": "string",
+          "description": "The identifier for the user's subscription plan (e.g., premium_monthly)."
+        },
+        "subscriptionStart": {
+          "type": "string",
+          "description": "Timestamp of when the subscription started.",
+          "format": "date-time"
+        },
+        "subscriptionSource": {
+          "type": "string",
+          "description": "The source of the subscription (e.g., stripe, apple)."
         }
       },
       "required": [
