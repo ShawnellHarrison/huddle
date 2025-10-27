@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { HuddleLogo } from '@/components/huddle-logo';
 import { cn } from '@/lib/utils';
 import {
@@ -19,6 +18,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+
 
 function GoogleIcon() {
     return (
@@ -33,7 +34,6 @@ function GoogleIcon() {
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
 });
 
 export default function LoginPage() {
@@ -45,7 +45,6 @@ export default function LoginPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
@@ -56,8 +55,22 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    initiateEmailSignIn(auth, values.email, values.password);
+    // This is a placeholder for passwordless sign-in, which would require more setup.
+    // For now, we'll just log the email.
+    console.log('Email submitted:', values.email);
+    // In a real scenario, you'd call a function like `sendSignInLinkToEmail`.
   }
+
+  const handleGoogleSignIn = async () => {
+    if (!auth) return;
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      // The onAuthStateChanged listener will handle the redirect.
+    } catch (error) {
+      console.error("Google Sign-In Error", error);
+    }
+  };
   
   if (isUserLoading || user) {
     return (
@@ -76,6 +89,17 @@ export default function LoginPage() {
             <p className="text-muted-foreground">Your business partner in your pocket awaits.</p>
         </div>
 
+        <div className="w-full flex flex-col space-y-3">
+            <Button onClick={handleGoogleSignIn} variant="outline" className="w-full btn">
+                <GoogleIcon />
+                <span>Sign in with Google</span>
+            </Button>
+        </div>
+        
+        <div className="w-full text-center">
+          <p className="text-xs text-muted-foreground">Or sign in with email</p>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
             <FormField
@@ -91,30 +115,10 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem className="text-left">
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} className="input" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className={cn('w-full btn btn-primary')}>Sign In</Button>
+            <Button type="submit" className={cn('w-full btn btn-primary')}>Send Sign-In Link</Button>
           </form>
         </Form>
         
-        <div className="w-full flex flex-col space-y-3">
-            <Button variant="outline" className="w-full btn">
-                <GoogleIcon />
-                <span>Sign in with Google</span>
-            </Button>
-        </div>
-
         <p className="text-xs text-muted-foreground">
           Don&apos;t have an account? <a href="#" className="underline hover:text-brand">Contact sales</a>
         </p>
