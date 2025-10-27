@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form';
 import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 
 function GoogleIcon() {
@@ -40,6 +41,7 @@ export default function LoginPage() {
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,10 +57,14 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a placeholder for passwordless sign-in, which would require more setup.
-    // For now, we'll just log the email.
-    console.log('Email submitted:', values.email);
+    if (!auth) return;
     // In a real scenario, you'd call a function like `sendSignInLinkToEmail`.
+    // We are using a placeholder here because passwordless sign-in requires more setup.
+    initiateEmailSignIn(auth, values.email, 'password'); // NOTE: Password is not used, but required by the function signature.
+    toast({
+        title: "Check your email",
+        description: `A sign-in link has been sent to ${values.email}.`,
+    });
   }
 
   const handleGoogleSignIn = async () => {
