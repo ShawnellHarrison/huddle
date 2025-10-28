@@ -114,24 +114,58 @@ export const businessPulseData = [
 
 export const teamWeekInReviewData = [
   {
-    ...users.find(u => u.displayName === 'Sarah'),
+    uid: 'user-1',
+    displayName: 'Sarah',
+    email: 'sarah@huddle.dev',
+    photoURL: 'https://picsum.photos/seed/user1/100/100',
+    role: 'admin',
+    companyId: 'company-1',
+    createdAt: new Date(),
+    lastSeenAt: new Date(),
+    level: 12,
+    xp: 450,
+    levelName: 'gold',
+    status: 'online',
     swi: 92,
     tasksCompleted: 12,
     kudos: 5,
   },
   {
-    ...users.find(u => u.displayName === 'Emily'),
+    uid: 'user-5',
+    displayName: 'Emily',
+    email: 'emily@huddle.dev',
+    photoURL: 'https://picsum.photos/seed/user5/100/100',
+    role: 'user',
+    companyId: 'company-1',
+    createdAt: new Date(),
+    lastSeenAt: new Date(),
+    level: 15,
+    xp: 150,
+    levelName: 'platinum',
+    status: 'online',
     swi: 88,
     tasksCompleted: 10,
     kudos: 3,
   },
   {
-    ...users.find(u => u.displayName === 'Jane'),
+    uid: 'user-3',
+    displayName: 'Jane',
+    email: 'jane@huddle.dev',
+    photoURL: 'https://picsum.photos/seed/user3/100/100',
+    role: 'user',
+    companyId: 'company-1',
+    createdAt: new Date(),
+    lastSeenAt: new Date(),
+    level: 9,
+    xp: 890,
+    levelName: 'silver',
+    status: 'focus',
     swi: 82,
     tasksCompleted: 8,
     kudos: 7,
   },
 ];
+
 
 export const weeklyReportData = {
   weekOf: "October 21, 2024",
@@ -229,3 +263,5 @@ export const lineItems: LineItem[] = [
     { id: 'li-3', invoiceId: 'inv-003', description: 'Full Stack Development (Q4)', qty: 1, unitPrice: 10000 },
     { id: 'li-4', invoiceId: 'inv-004', description: 'Emergency Server Support', qty: 3, unitPrice: 400 },
 ];
+
+    

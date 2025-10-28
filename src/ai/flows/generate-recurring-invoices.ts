@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -91,11 +92,10 @@ const createNewDraftInvoice = ai.defineTool(
         description: 'Creates a new draft invoice based on an existing one and updates the original invoice\'s lastGeneratedAt timestamp.',
         inputSchema: z.object({
             originalInvoice: z.any().describe('The original invoice data.'),
-            companyId: z.string().describe('The ID of the company.'),
         }),
         outputSchema: z.string().describe('The ID of the new invoice.'),
     },
-    async ({ originalInvoice, companyId }) => {
+    async ({ originalInvoice }) => {
         const { firestore } = initializeFirebase();
         const invoicesRef = collection(firestore, 'invoices');
         const originalInvoiceRef = doc(firestore, 'invoices', originalInvoice.id);
@@ -141,7 +141,7 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
   async ({ companyId }) => {
     
     const llmResponse = await ai.generate({
-        prompt: `You are an automated billing assistant for the company with ID "${companyId}". Your task is to identify and process recurring monthly invoices that are due for renewal. First, find all renewable invoices. Then, for each one, create a new draft. Finally, report the outcome.`,
+        prompt: `You are an automated billing assistant for the company with ID "${companyId}". Your task is to identify and process recurring monthly invoices that are due for renewal. First, find all renewable invoices using the getRenewableInvoices tool. Then, for each renewable invoice found, create a new draft using the createNewDraftInvoice tool. Finally, report the outcome.`,
         model: 'googleai/gemini-2.5-flash',
         tools: [getRenewableInvoices, createNewDraftInvoice],
     });
@@ -170,3 +170,5 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
     }
   }
 );
+
+    

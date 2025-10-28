@@ -52,7 +52,6 @@ export interface Task {
     assignee: string;
     dueDate: Date;
     status: 'todo' | 'in_progress' | 'done';
-    priority: 'low' | 'medium' | 'high';
     tags?: string[];
     commentsCount: number;
     attachmentsCount: number;
@@ -95,3 +94,5 @@ export interface LineItem {
     qty: number;
     unitPrice: number;
 }
+
+    
