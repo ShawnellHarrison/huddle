@@ -1,10 +1,4 @@
 import type {NextConfig} from 'next';
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-});
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -29,7 +23,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https' as const,
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
@@ -38,4 +32,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+let configWithPwa = nextConfig;
+
+// Turbopack doesn't support withPWA yet, so we only enable it for production builds (which use Webpack).
+if (process.env.NODE_ENV === 'production') {
+    const withPWA = require('next-pwa')({
+        dest: 'public',
+        register: true,
+        skipWaiting: true,
+    });
+    configWithPwa = withPWA(nextConfig);
+}
+
+
+export default configWithPwa;
