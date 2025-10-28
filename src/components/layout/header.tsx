@@ -1,13 +1,15 @@
 
+
 "use client"
 
 import { Button } from '@/components/ui/button';
-import { Bell, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Bell, Search, ChevronLeft, ChevronRight, Coffee } from 'lucide-react';
 import { SearchCommand } from '@/components/search-command';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 
 function PresenceAvatars() {
     const onlineUsers = users.filter(u => u.status !== 'away' && u.role !== 'client');
@@ -27,7 +29,34 @@ export function Header() {
   const [openSearch, setOpenSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { toast } = useToast();
   const pageTitle = pathname === '/' ? 'Lobby' : (pathname.split('/').pop() || 'lobby').replace('-', ' ');
+
+  const handleCoffeeClick = () => {
+    if (!navigator.geolocation) {
+      toast({
+        variant: 'destructive',
+        title: 'Geolocation not supported',
+        description: 'Your browser does not support geolocation.',
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=coffee&ll=${latitude},${longitude}`;
+        window.open(mapsUrl, '_blank');
+      },
+      (error) => {
+        toast({
+          variant: 'destructive',
+          title: 'Could not get location',
+          description: 'Please enable location services in your browser settings.',
+        });
+      }
+    );
+  };
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
@@ -49,6 +78,10 @@ export function Header() {
         <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setOpenSearch(true)}>
           <Search className="h-5 w-5" />
           <span className="sr-only">Search</span>
+        </Button>
+        <Button variant="ghost" size="icon" className="rounded-full" onClick={handleCoffeeClick}>
+            <Coffee className="h-5 w-5" />
+            <span className="sr-only">Find nearest coffee shop</span>
         </Button>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="h-5 w-5" />
