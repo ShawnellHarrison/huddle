@@ -8,7 +8,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the user entity."
+          "description": "Unique identifier for the User entity."
         },
         "displayName": {
           "type": "string",
@@ -30,11 +30,11 @@
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N User)"
+          "description": "Reference to the Company the user belongs to. (Relationship: Company 1:N User)"
         },
         "createdAt": {
           "type": "string",
-          "description": "Timestamp of when the user was created.",
+          "description": "Timestamp of when the user account was created.",
           "format": "date-time"
         },
         "lastSeenAt": {
@@ -49,23 +49,6 @@
         "xp": {
           "type": "number",
           "description": "The user's current experience points."
-        },
-        "isPremium": {
-          "type": "boolean",
-          "description": "Indicates if the user has an active premium subscription."
-        },
-        "plan": {
-          "type": "string",
-          "description": "The identifier for the user's subscription plan (e.g., premium_monthly)."
-        },
-        "subscriptionStart": {
-          "type": "string",
-          "description": "Timestamp of when the subscription started.",
-          "format": "date-time"
-        },
-        "subscriptionSource": {
-          "type": "string",
-          "description": "The source of the subscription (e.g., stripe, apple)."
         }
       },
       "required": [
@@ -74,7 +57,10 @@
         "email",
         "role",
         "companyId",
-        "createdAt"
+        "createdAt",
+        "lastSeenAt",
+        "level",
+        "xp"
       ]
     },
     "Company": {
@@ -85,7 +71,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the company entity."
+          "description": "Unique identifier for the Company entity."
         },
         "name": {
           "type": "string",
@@ -93,7 +79,7 @@
         },
         "ownerUid": {
           "type": "string",
-          "description": "Reference to User who owns the company. (Relationship: User 1:N Company)"
+          "description": "Reference to the User who owns the company. (Relationship: User 1:N Company)"
         },
         "plan": {
           "type": "string",
@@ -121,11 +107,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the channel entity."
+          "description": "Unique identifier for the Channel entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Channel)"
+          "description": "Reference to the Company the channel belongs to. (Relationship: Company 1:N Channel)"
         },
         "name": {
           "type": "string",
@@ -137,14 +123,14 @@
         },
         "members": {
           "type": "array",
-          "description": "Array of user IDs that are members of the channel.",
+          "description": "List of user IDs who are members of the channel.",
           "items": {
             "type": "string"
           }
         },
         "projectId": {
           "type": "string",
-          "description": "Reference to Project. (Relationship: Project 1:N Channel). Nullable."
+          "description": "Reference to the Project the channel is associated with, if any. (Relationship: Project 1:N Channel)"
         },
         "createdAt": {
           "type": "string",
@@ -165,23 +151,23 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Message",
       "type": "object",
-      "description": "Represents a message within a communication channel.",
+      "description": "Represents a message within a channel.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the message entity."
-        },
-        "channelId": {
-          "type": "string",
-          "description": "Reference to Channel. (Relationship: Channel 1:N Message)"
+          "description": "Unique identifier for the Message entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Message)"
+          "description": "Reference to the Company the message belongs to. (Relationship: Company 1:N Message)"
         },
         "fromUid": {
           "type": "string",
-          "description": "Reference to User who sent the message. (Relationship: User 1:N Message)"
+          "description": "Reference to the User who sent the message. (Relationship: User 1:N Message)"
+        },
+        "channelId": {
+          "type": "string",
+          "description": "Reference to the Channel the message was sent in. (Relationship: Channel 1:N Message)"
         },
         "text": {
           "type": "string",
@@ -189,15 +175,17 @@
         },
         "embeds": {
           "type": "string",
-          "description": "Smart embeds for task/invoice/client links. Nullable."
+          "description": "Map of embedded content within the message.",
+          "format": "map"
         },
         "threadRootId": {
           "type": "string",
-          "description": "Reference to Message. (Relationship: Message 1:N Message). Nullable."
+          "description": "Reference to the root message of the thread, if this is a thread reply. (Relationship: Message 1:N Message (Thread))"
         },
         "reactions": {
           "type": "string",
-          "description": "Map of emoji reactions and the number of times each was used."
+          "description": "Map of emoji reactions to the message, with the count for each emoji.",
+          "format": "map"
         },
         "createdAt": {
           "type": "string",
@@ -207,9 +195,9 @@
       },
       "required": [
         "id",
-        "channelId",
         "companyId",
         "fromUid",
+        "channelId",
         "text",
         "createdAt"
       ]
@@ -222,11 +210,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the project entity."
+          "description": "Unique identifier for the Project entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Project)"
+          "description": "Reference to the Company the project belongs to. (Relationship: Company 1:N Project)"
         },
         "name": {
           "type": "string",
@@ -242,11 +230,11 @@
         },
         "createdBy": {
           "type": "string",
-          "description": "Reference to User who created the project. (Relationship: User 1:N Project)"
+          "description": "Reference to the User who created the project. (Relationship: User 1:N Project)"
         },
         "members": {
           "type": "array",
-          "description": "Array of user IDs that are members of the project.",
+          "description": "List of user IDs who are members of the project.",
           "items": {
             "type": "string"
           }
@@ -276,11 +264,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the task entity."
+          "description": "Unique identifier for the Task entity."
         },
         "projectId": {
           "type": "string",
-          "description": "Reference to Project. (Relationship: Project 1:N Task)"
+          "description": "Reference to the Project the task belongs to. (Relationship: Project 1:N Task)"
         },
         "title": {
           "type": "string",
@@ -292,7 +280,7 @@
         },
         "assignee": {
           "type": "string",
-          "description": "Reference to User assigned to the task. (Relationship: User 1:N Task)"
+          "description": "Reference to the User assigned to the task. (Relationship: User 1:N Task)"
         },
         "dueDate": {
           "type": "string",
@@ -313,7 +301,7 @@
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Task)"
+          "description": "Reference to the Company the task belongs to. (Relationship: Company 1:N Task)"
         },
         "createdAt": {
           "type": "string",
@@ -322,7 +310,7 @@
         },
         "suggestions": {
           "type": "string",
-          "description": "AI suggested next step. Nullable."
+          "description": "Suggestions for the next step in the task."
         }
       },
       "required": [
@@ -347,15 +335,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the invoice entity."
+          "description": "Unique identifier for the Invoice entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Invoice)"
+          "description": "Reference to the Company the invoice belongs to. (Relationship: Company 1:N Invoice)"
         },
         "clientId": {
           "type": "string",
-          "description": "Reference to Client. (Relationship: Client 1:N Invoice)"
+          "description": "Reference to the Client the invoice is for. (Relationship: Client 1:N Invoice)"
         },
         "number": {
           "type": "string",
@@ -367,7 +355,7 @@
         },
         "subtotal": {
           "type": "number",
-          "description": "The subtotal amount of the invoice."
+          "description": "The subtotal of the invoice."
         },
         "tax": {
           "type": "number",
@@ -393,7 +381,7 @@
         },
         "repeatMonthly": {
           "type": "boolean",
-          "description": "Whether the invoice should repeat monthly."
+          "description": "Whether the invoice should be repeated monthly."
         },
         "lastGeneratedAt": {
           "type": "string",
@@ -402,11 +390,12 @@
         },
         "payLink": {
           "type": "string",
-          "description": "The payment link for the invoice."
+          "description": "The payment link for the invoice.",
+          "format": "uri"
         },
         "portalToken": {
           "type": "string",
-          "description": "Token for read-only client view"
+          "description": "Token for the client portal view of the invoice."
         }
       },
       "required": [
@@ -428,15 +417,15 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "LineItem",
       "type": "object",
-      "description": "Represents a line item within an invoice.",
+      "description": "Represents a line item on an invoice.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the line item entity."
+          "description": "Unique identifier for the LineItem entity."
         },
         "invoiceId": {
           "type": "string",
-          "description": "Reference to Invoice. (Relationship: Invoice 1:N LineItem)"
+          "description": "Reference to the Invoice the line item belongs to. (Relationship: Invoice 1:N LineItem)"
         },
         "description": {
           "type": "string",
@@ -467,11 +456,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the client entity."
+          "description": "Unique identifier for the Client entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Client)"
+          "description": "Reference to the Company the client belongs to. (Relationship: Company 1:N Client)"
         },
         "name": {
           "type": "string",
@@ -513,7 +502,9 @@
         "id",
         "companyId",
         "name",
-        "email"
+        "email",
+        "phone",
+        "website"
       ]
     },
     "Expense": {
@@ -524,15 +515,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the expense entity."
+          "description": "Unique identifier for the Expense entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Expense)"
+          "description": "Reference to the Company the expense belongs to. (Relationship: Company 1:N Expense)"
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User who created the expense. (Relationship: User 1:N Expense)"
+          "description": "Reference to the User who submitted the expense. (Relationship: User 1:N Expense)"
         },
         "vendor": {
           "type": "string",
@@ -557,15 +548,16 @@
         },
         "imagePath": {
           "type": "string",
-          "description": "The path to the image of the expense receipt. Nullable."
+          "description": "The path to the image of the expense receipt.",
+          "format": "uri"
         },
         "ocrRaw": {
           "type": "string",
-          "description": "The raw OCR text from the expense receipt. Nullable."
+          "description": "The raw OCR text from the expense receipt."
         },
         "aiCategoryGuess": {
           "type": "string",
-          "description": "The AI's guess of the expense category. Nullable."
+          "description": "The AI's guess of the expense category."
         }
       },
       "required": [
@@ -587,37 +579,37 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the time entry entity."
+          "description": "Unique identifier for the TimeEntry entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N TimeEntry)"
+          "description": "Reference to the Company the time entry belongs to. (Relationship: Company 1:N TimeEntry)"
         },
         "projectId": {
           "type": "string",
-          "description": "Reference to Project. (Relationship: Project 1:N TimeEntry)"
+          "description": "Reference to the Project the time entry is for. (Relationship: Project 1:N TimeEntry)"
         },
         "userId": {
           "type": "string",
-          "description": "Reference to User who created the time entry. (Relationship: User 1:N TimeEntry)"
+          "description": "Reference to the User who created the time entry. (Relationship: User 1:N TimeEntry)"
         },
         "startedAt": {
           "type": "string",
-          "description": "Timestamp of when the time entry was started.",
+          "description": "Timestamp of when the time entry started.",
           "format": "date-time"
         },
         "stoppedAt": {
           "type": "string",
-          "description": "Timestamp of when the time entry was stopped.",
+          "description": "Timestamp of when the time entry stopped.",
           "format": "date-time"
         },
         "durationSec": {
           "type": "number",
-          "description": "The duration of the time entry in seconds. Nullable."
+          "description": "The duration of the time entry in seconds."
         },
         "billableRate": {
           "type": "number",
-          "description": "The billable rate for the time entry. Nullable."
+          "description": "The billable rate for the time entry."
         },
         "note": {
           "type": "string",
@@ -640,15 +632,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the document entity."
+          "description": "Unique identifier for the Document entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Document)"
+          "description": "Reference to the Company the document belongs to. (Relationship: Company 1:N Document)"
         },
         "uploadedBy": {
           "type": "string",
-          "description": "Reference to User who uploaded the document. (Relationship: User 1:N Document)"
+          "description": "Reference to the User who uploaded the document. (Relationship: User 1:N Document)"
         },
         "name": {
           "type": "string",
@@ -660,15 +652,16 @@
         },
         "storagePath": {
           "type": "string",
-          "description": "The path to the document in storage."
+          "description": "The path to the document in storage.",
+          "format": "uri"
         },
         "summary": {
           "type": "string",
-          "description": "A summary of the document generated by AI. Nullable."
+          "description": "A summary of the document."
         },
         "bullets": {
           "type": "array",
-          "description": "Bullet points extracted from the document by AI. Nullable.",
+          "description": "A list of bullet points summarizing the document.",
           "items": {
             "type": "string"
           }
@@ -697,15 +690,15 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the notification entity."
+          "description": "Unique identifier for the Notification entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Notification)"
+          "description": "Reference to the Company the notification belongs to. (Relationship: Company 1:N Notification)"
         },
         "uid": {
           "type": "string",
-          "description": "Reference to User who receives the notification. (Relationship: User 1:N Notification)"
+          "description": "Reference to the User the notification is for. (Relationship: User 1:N Notification)"
         },
         "type": {
           "type": "string",
@@ -748,11 +741,11 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the report entity."
+          "description": "Unique identifier for the Report entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Report)"
+          "description": "Reference to the Company the report belongs to. (Relationship: Company 1:N Report)"
         },
         "type": {
           "type": "string",
@@ -760,7 +753,8 @@
         },
         "payload": {
           "type": "string",
-          "description": "The payload of the report. Can contain SWI data, etc.."
+          "description": "The payload of the report.",
+          "format": "map"
         },
         "createdAt": {
           "type": "string",
@@ -780,15 +774,15 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "PortalView",
       "type": "object",
-      "description": "Represents a portal view.",
+      "description": "Represents a portal view for an invoice.",
       "properties": {
         "token": {
           "type": "string",
-          "description": "Unique identifier for the portal view entity."
+          "description": "Unique token for the portal view."
         },
         "invoiceId": {
           "type": "string",
-          "description": "Reference to Invoice being viewed. (Relationship: Invoice 1:N PortalView)"
+          "description": "Reference to the Invoice the portal view is for. (Relationship: Invoice 1:N PortalView)"
         },
         "expiresAt": {
           "type": "string",
@@ -805,23 +799,23 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Kudo",
       "type": "object",
-      "description": "Represents a kudo.",
+      "description": "Represents a kudo given to a user.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the kudo entity."
+          "description": "Unique identifier for the Kudo entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Kudo)"
+          "description": "Reference to the Company the kudo belongs to. (Relationship: Company 1:N Kudo)"
         },
         "fromUid": {
           "type": "string",
-          "description": "Reference to User who sent the kudo. (Relationship: User 1:N Kudo)"
+          "description": "Reference to the User who gave the kudo. (Relationship: User 1:N Kudo (Giver))"
         },
         "toUid": {
           "type": "string",
-          "description": "Reference to User who received the kudo. (Relationship: User 1:N Kudo)"
+          "description": "Reference to the User who received the kudo. (Relationship: User 1:N Kudo (Receiver))"
         },
         "reason": {
           "type": "string",
@@ -851,19 +845,20 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Presence",
       "type": "object",
-      "description": "Represents a user's presence.",
+      "description": "Represents the presence status of a user.",
       "properties": {
         "uid": {
           "type": "string",
-          "description": "Unique identifier for the presence entity."
+          "description": "Unique identifier for the Presence entity."
         },
         "companyId": {
           "type": "string",
-          "description": "Reference to Company. (Relationship: Company 1:N Presence)"
+          "description": "Reference to the Company the presence belongs to. (Relationship: Company 1:N Presence)"
         },
         "lastSeenAt": {
           "type": "string",
-          "description": "Timestamp of when the user was"
+          "description": "Timestamp of when the user was last seen online.",
+          "format": "date-time"
         }
       }
     }
@@ -877,17 +872,17 @@
   "firestore": {
     "structure": [
       {
-        "path": "/users/{uid}",
+        "path": "/users/{userId}",
         "definition": {
           "entityName": "User",
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information. Uses path-based ownership; access is restricted to the user and admins within the same company.",
+          "description": "Stores user profiles. The `userId` parameter corresponds to the Firebase Auth UID.",
           "params": [
             {
-              "name": "uid",
-              "description": "The unique identifier of the user."
+              "name": "userId",
+              "description": "The unique identifier for the user, matching the Firebase Auth UID."
             }
           ]
         }
@@ -899,11 +894,11 @@
           "schema": {
             "$ref": "#/backend/entities/Company"
           },
-          "description": "Stores company information. Access is restricted to company admins.",
+          "description": "Stores company information. The `companyId` is used to scope data access.",
           "params": [
             {
               "name": "companyId",
-              "description": "The unique identifier of the company."
+              "description": "The unique identifier for the company."
             }
           ]
         }
@@ -915,11 +910,11 @@
           "schema": {
             "$ref": "#/backend/entities/Channel"
           },
-          "description": "Stores channel information. Includes denormalized 'members' list for authorization independence. Access is restricted to members of the channel within the company.",
+          "description": "Stores channel information. Includes denormalized 'members' array for authorization independence.",
           "params": [
             {
               "name": "channelId",
-              "description": "The unique identifier of the channel."
+              "description": "The unique identifier for the channel."
             }
           ]
         }
@@ -931,15 +926,15 @@
           "schema": {
             "$ref": "#/backend/entities/Message"
           },
-          "description": "Stores messages within a channel. Access is restricted to members of the channel within the company.  Denormalizes `companyId` from parent channel.",
+          "description": "Stores messages within a channel.  Includes denormalized data from the parent channel, like the `members` array, to ensure authorization independence.",
           "params": [
             {
               "name": "channelId",
-              "description": "The unique identifier of the channel."
+              "description": "The unique identifier for the channel the message belongs to."
             },
             {
               "name": "messageId",
-              "description": "The unique identifier of the message."
+              "description": "The unique identifier for the message."
             }
           ]
         }
@@ -951,11 +946,11 @@
           "schema": {
             "$ref": "#/backend/entities/Project"
           },
-          "description": "Stores project information. Access is restricted to project members within the company.",
+          "description": "Stores project information. Includes the 'members' array.",
           "params": [
             {
               "name": "projectId",
-              "description": "The unique identifier of the project."
+              "description": "The unique identifier for the project."
             }
           ]
         }
@@ -967,15 +962,15 @@
           "schema": {
             "$ref": "#/backend/entities/Task"
           },
-          "description": "Stores tasks within a project. Access is restricted to project members and the assigned user, within the company. Denormalizes `companyId` from parent project. Task can be written to by the assignee of the task.",
+          "description": "Stores tasks within a project.",
           "params": [
             {
               "name": "projectId",
-              "description": "The unique identifier of the project."
+              "description": "The unique identifier for the project the task belongs to."
             },
             {
               "name": "taskId",
-              "description": "The unique identifier of the task."
+              "description": "The unique identifier for the task."
             }
           ]
         }
@@ -987,11 +982,11 @@
           "schema": {
             "$ref": "#/backend/entities/Invoice"
           },
-          "description": "Stores invoice information. Access is restricted to company users.",
+          "description": "Stores invoice information.",
           "params": [
             {
               "name": "invoiceId",
-              "description": "The unique identifier of the invoice."
+              "description": "The unique identifier for the invoice."
             }
           ]
         }
@@ -1003,15 +998,15 @@
           "schema": {
             "$ref": "#/backend/entities/LineItem"
           },
-          "description": "Stores line items within an invoice. Access is restricted to company users who can access the parent invoice.",
+          "description": "Stores line items within an invoice.",
           "params": [
             {
               "name": "invoiceId",
-              "description": "The unique identifier of the invoice."
+              "description": "The unique identifier for the invoice the line item belongs to."
             },
             {
               "name": "lineItemId",
-              "description": "The unique identifier of the line item."
+              "description": "The unique identifier for the line item."
             }
           ]
         }
@@ -1023,11 +1018,11 @@
           "schema": {
             "$ref": "#/backend/entities/Client"
           },
-          "description": "Stores client information. Access is restricted to company users.",
+          "description": "Stores client information.",
           "params": [
             {
               "name": "clientId",
-              "description": "The unique identifier of the client."
+              "description": "The unique identifier for the client."
             }
           ]
         }
@@ -1039,11 +1034,11 @@
           "schema": {
             "$ref": "#/backend/entities/Expense"
           },
-          "description": "Stores expense information.  Access is restricted to the user who created the expense and company admins.",
+          "description": "Stores expense information.",
           "params": [
             {
               "name": "expenseId",
-              "description": "The unique identifier of the expense."
+              "description": "The unique identifier for the expense."
             }
           ]
         }
@@ -1055,11 +1050,11 @@
           "schema": {
             "$ref": "#/backend/entities/TimeEntry"
           },
-          "description": "Stores time entry information. Access is restricted to the user who created the time entry and company admins.",
+          "description": "Stores time entry information.",
           "params": [
             {
               "name": "timeEntryId",
-              "description": "The unique identifier of the time entry."
+              "description": "The unique identifier for the time entry."
             }
           ]
         }
@@ -1071,11 +1066,11 @@
           "schema": {
             "$ref": "#/backend/entities/Document"
           },
-          "description": "Stores document information. Access is restricted to company users.",
+          "description": "Stores document metadata.",
           "params": [
             {
               "name": "docId",
-              "description": "The unique identifier of the document."
+              "description": "The unique identifier for the document."
             }
           ]
         }
@@ -1087,11 +1082,11 @@
           "schema": {
             "$ref": "#/backend/entities/Notification"
           },
-          "description": "Stores notification information. Access is restricted to the user the notification is intended for.",
+          "description": "Stores notification information.",
           "params": [
             {
               "name": "notificationId",
-              "description": "The unique identifier of the notification."
+              "description": "The unique identifier for the notification."
             }
           ]
         }
@@ -1103,11 +1098,11 @@
           "schema": {
             "$ref": "#/backend/entities/Report"
           },
-          "description": "Stores report information. Access is restricted to company admins.",
+          "description": "Stores report data.",
           "params": [
             {
               "name": "reportId",
-              "description": "The unique identifier of the report."
+              "description": "The unique identifier for the report."
             }
           ]
         }
@@ -1119,7 +1114,7 @@
           "schema": {
             "$ref": "#/backend/entities/PortalView"
           },
-          "description": "Stores portal view information.",
+          "description": "Stores portal view tokens for invoices.",
           "params": [
             {
               "name": "token",
@@ -1135,11 +1130,11 @@
           "schema": {
             "$ref": "#/backend/entities/Kudo"
           },
-          "description": "Stores kudo information. Access is restricted to company users.",
+          "description": "Stores kudos given to users.",
           "params": [
             {
               "name": "kudoId",
-              "description": "The unique identifier of the kudo."
+              "description": "The unique identifier for the kudo."
             }
           ]
         }
@@ -1151,16 +1146,32 @@
           "schema": {
             "$ref": "#/backend/entities/Presence"
           },
-          "description": "Stores user presence information. Uses path-based ownership; access is restricted to the user and admins within the same company.",
+          "description": "Stores user presence status.",
           "params": [
             {
               "name": "uid",
-              "description": "The unique identifier of the user."
+              "description": "The unique identifier for the user (UID)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{uid}",
+        "definition": {
+          "entityName": "adminRole",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A document here represents a user with the 'admin' role. Existence of the document confers the role.",
+          "params": [
+            {
+              "name": "uid",
+              "description": "The unique identifier for the user who has the admin role."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to provide a secure and scalable foundation for the Huddle application, adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. This design avoids hierarchical authorization dependencies by denormalizing authorization context, enabling atomic operations and simplifying security rules. Segregation ensures that collections have a homogeneous security posture, while access modeling provides consistency.\n\n**Authorization Independence (Denormalization):**\n*   `Channels` and `Messages`: The `members` list in the `Channel` document is denormalized.  This ensures that message creation rules can validate membership without needing to `get()` the channel document. The `companyId` is present in `Channels` and `Messages` to enforce company-level access. Further more, `companyId` is present in every document to prevent cross-company reads/writes.\n*   `Projects` and `Tasks`: The `members` list in the `Project` document is denormalized into `Task` documents. Along with `companyId`, this ensures that task rules can validate membership without needing to `get()` the project document. The `assignee` field in the Task document allows direct assignment and simplifies write rules for the assigned user. The `companyId` is present in `Projects` and `Tasks` to enforce company-level access.\n*   `Notifications`: Each notification includes the `uid` of the user who should receive it, eliminating the need to query based on recipient. This enables efficient and secure delivery of notifications.\n\n**Structural Segregation:**\n*   User-owned data such as `Expenses`, `TimeEntries`, and `Documents` are stored under the `/companies/{companyId}/{entityName}/{entityId}` collection, simplifying ownership-based rules.\n\n**Access Modeling:**\n*   Path-Based Ownership: Private data like user profiles (`/users/{uid}`) and presence (`/presence/{uid}`) are organized using path-based ownership for simplified access control.\n*   Membership Map: The `members` array field on `Channel` documents enables collaborative access, allowing users within a company to be granted access to specific channels.\n\n**QAPs (Rules are not Filters):**\n*   The data structure supports secure `list` operations by ensuring all documents within a collection share the same security requirements.  The segregation of data by company and user roles (`admin`, `user`, `client`) enforces these requirements.\n\nThis structure prioritizes security and debuggability by making authorization intent clear and explicit. The denormalization strategy ensures atomic operations are possible and avoids complex rule logic."
+    "reasoning": "This Firestore structure is designed to support the Huddle application, prioritizing security, scalability, and debuggability based on the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), QAPs (Rules are not Filters), and Invariants.\n\nAuthorization Independence is achieved through denormalization. For example, access to messages within a channel depends on channel membership. Therefore, the `members` field (or a hash of it) from the `/channels/{channelId}` document MUST be copied into each `/channels/{channelId}/messages/{messageId}` document. This eliminates the need for `get()` calls in security rules when writing or reading messages and ensures atomic operations.\n\nStructural Segregation is applied by keeping data with different security postures in separate collections. For example, user-owned data is stored under `/users/{userId}`, while company-wide data resides in top-level collections like `/companies` or `/channels`. This simplifies security rules by ensuring that all documents within a collection share similar access requirements.\n\nAccess Modeling utilizes consistent patterns: private user data under `/users/{userId}`, hierarchical paths for user-owned entities like `/projects/{projectId}/tasks/{taskId}`, membership maps for collaborative data (denormalized where necessary), and dedicated collections (e.g., `/roles_admin/{uid}`) for global roles.\n\nThe structure supports QAPs (Rules are not Filters) by using structural segregation and denormalization. For example, listing messages within a channel is secured by the denormalized `members` field on the message. If the user is not a member of the channel, they cannot list the messages, regardless of any other data in the message.\n\nInvariants are maintained by using path-based ownership and timestamps. For example, the `companyId` field is present in every document to enforce company scoping, and timestamps like `createdAt` and `lastSeenAt` provide auditability.\n\nThis structure ensures that security rules can be written clearly and efficiently, without relying on complex logic or hierarchical data access. It also provides a scalable and maintainable foundation for the Huddle application."
   }
 }
