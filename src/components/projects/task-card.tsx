@@ -13,12 +13,6 @@ interface TaskCardProps {
   task: Task;
 }
 
-const priorityColors: { [key: string]: string } = {
-  low: 'bg-green-500',
-  medium: 'bg-yellow-500',
-  high: 'bg-red-500',
-};
-
 export function TaskCard({ task }: TaskCardProps) {
   const assignee = users.find((user: User) => user.uid === task.assignee);
 
@@ -27,18 +21,6 @@ export function TaskCard({ task }: TaskCardProps) {
       <CardHeader className="p-4">
         <div className="flex justify-between items-start">
           <span className="text-sm font-semibold">{task.title}</span>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <div
-                  className={`w-3 h-3 rounded-full ${priorityColors[task.priority]}`}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="capitalize">{task.priority} Priority</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0">
