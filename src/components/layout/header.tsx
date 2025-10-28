@@ -2,10 +2,10 @@
 "use client"
 
 import { Button } from '@/components/ui/button';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SearchCommand } from '@/components/search-command';
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -25,12 +25,23 @@ function PresenceAvatars() {
 
 export function Header() {
   const [openSearch, setOpenSearch] = useState(false);
+  const router = useRouter();
   const pathname = usePathname();
   const pageTitle = (pathname.split('/').pop() || 'dashboard').replace('-', ' ');
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-      <div className="flex-1 md:ml-0 ml-10">
+      <div className="flex-1 md:ml-0 ml-10 flex items-center gap-4">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="h-8 w-8">
+            <ChevronLeft className="h-5 w-5" />
+            <span className="sr-only">Back</span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => router.forward()} className="h-8 w-8">
+            <ChevronRight className="h-5 w-5" />
+            <span className="sr-only">Forward</span>
+          </Button>
+        </div>
         <h1 className="text-lg font-headline font-semibold capitalize">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 md:gap-4">
