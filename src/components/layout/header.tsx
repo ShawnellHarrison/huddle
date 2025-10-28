@@ -1,7 +1,6 @@
 
 "use client"
 
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Bell, Search } from 'lucide-react';
 import { SearchCommand } from '@/components/search-command';
@@ -31,10 +30,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-      <div className="md:hidden">
-        <SidebarTrigger />
-      </div>
-      <div className="flex-1">
+      <div className="flex-1 md:ml-0 ml-10">
         <h1 className="text-lg font-headline font-semibold capitalize">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 md:gap-4">

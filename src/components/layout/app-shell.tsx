@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { MainSidebar } from '@/components/layout/main-sidebar';
 import { Header } from '@/components/layout/header';
 import { cn } from '@/lib/utils';
@@ -49,7 +49,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       {showSidebar && <MainSidebar />}
       <SidebarInset className={cn(!showSidebar && "ml-0")}>
-        {showHeader && <Header />}
+        {showHeader && (
+          <>
+            <div className="md:hidden fixed top-3 left-3 z-20">
+              <SidebarTrigger />
+            </div>
+            <Header />
+          </>
+        )}
         <main className={cn(
           "flex-1 overflow-y-auto",
           isLoginPage 
