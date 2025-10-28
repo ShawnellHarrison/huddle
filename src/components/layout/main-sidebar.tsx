@@ -79,7 +79,6 @@ export function MainSidebar() {
   
   // Find the full user profile from mock data using the authenticated user's UID
   const currentUser = users.find(u => u.email === user.email) || users[0];
-  const otherUserForDM = users.find(u => u.uid !== currentUser.uid);
 
   return (
     <Sidebar>

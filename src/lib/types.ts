@@ -56,7 +56,6 @@ export interface Task {
     tags?: string[];
     commentsCount: number;
     attachmentsCount: number;
-    order: number;
     companyId: string;
     createdAt: Date;
 }

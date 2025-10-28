@@ -10,7 +10,7 @@ export const messages: Message[] = [
   { id: 'msg-5', channelId: 'ch-1', fromUid: 'user-2', text: "Perfect. Let's sync up tomorrow morning to finalize.", createdAt: subMinutes(new Date(), 10) },
 
   // Channel ch-4: project-hydra
-  { id: 'msg-6', channelId: 'ch-4', fromUid: 'user-5', text: "Okay, I'm hitting a snag with the data hydration on the Hydra dashboard. The server-side render doesn't seem to match the client. Anyone seen this before?", createdAt: subMinutes(newDate(), 45) },
+  { id: 'msg-6', channelId: 'ch-4', fromUid: 'user-5', text: "Okay, I'm hitting a snag with the data hydration on the Hydra dashboard. The server-side render doesn't seem to match the client. Anyone seen this before?", createdAt: subMinutes(new Date(), 45) },
   { id: 'msg-7', channelId: 'ch-4', fromUid: 'user-2', text: "Ah, classic hydration mismatch. Check your `useEffect` hooks. Are you using `Math.random()` or `new Date()` outside of them?", createdAt: subMinutes(new Date(), 42) },
   { id: 'msg-8', channelId: 'ch-4', fromUid: 'user-5', text: "That was it! I had a `new Date()` call for a timestamp directly in the render. Moving it to `useEffect` fixed it. Thanks, Mike!", createdAt: subMinutes(new Date(), 30) },
 

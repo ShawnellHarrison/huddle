@@ -295,14 +295,6 @@
           "type": "string",
           "description": "The status of the task (todo, in_progress, done)."
         },
-        "percentComplete": {
-          "type": "number",
-          "description": "The percentage of the task that is complete."
-        },
-        "order": {
-          "type": "number",
-          "description": "The order of the task within the project."
-        },
         "companyId": {
           "type": "string",
           "description": "Reference to the Company the task belongs to. (Relationship: Company 1:N Task)"
@@ -325,8 +317,6 @@
         "assignee",
         "dueDate",
         "status",
-        "percentComplete",
-        "order",
         "companyId",
         "createdAt"
       ]
