@@ -41,6 +41,7 @@ export default function CrmPage() {
                     <TableHeader>
                         <TableRow>
                         <TableHead>User</TableHead>
+                        <TableHead>Email</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Level</TableHead>
                         <TableHead>XP</TableHead>
@@ -58,10 +59,10 @@ export default function CrmPage() {
                                     </Avatar>
                                     <div className="flex flex-col">
                                         <span>{user.displayName}</span>
-                                        <span className="text-xs text-muted-foreground">{user.email}</span>
                                     </div>
                                 </div>
                             </TableCell>
+                            <TableCell>{user.email}</TableCell>
                             <TableCell>
                                 <Badge variant="outline" className={cn("capitalize", roleClasses[user.role])}>{user.role}</Badge>
                             </TableCell>
