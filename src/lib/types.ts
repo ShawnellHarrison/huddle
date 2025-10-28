@@ -94,5 +94,3 @@ export interface LineItem {
     qty: number;
     unitPrice: number;
 }
-
-    

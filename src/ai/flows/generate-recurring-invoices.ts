@@ -144,16 +144,22 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
         prompt: `You are an automated billing assistant for the company with ID "${companyId}". Your task is to identify and process recurring monthly invoices that are due for renewal. First, find all renewable invoices using the getRenewableInvoices tool. Then, for each renewable invoice found, create a new draft using the createNewDraftInvoice tool. Finally, report the outcome.`,
         model: 'googleai/gemini-2.5-flash',
         tools: [getRenewableInvoices, createNewDraftInvoice],
+        toolConfig: {
+            execution: 'tool'
+        }
     });
 
-    const toolCalls = llmResponse.toolCalls();
+    const toolOutputs = llmResponse.toolRequest()?.outputs;
 
     let createdCount = 0;
-    for (const toolCall of toolCalls) {
-        if(toolCall.toolName === 'createNewDraftInvoice'){
-            createdCount++;
+    if (toolOutputs) {
+        for (const output of toolOutputs) {
+            if(output.toolName === 'createNewDraftInvoice'){
+                createdCount++;
+            }
         }
     }
+
 
     if (createdCount > 0) {
       return {
@@ -170,5 +176,3 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
     }
   }
 );
-
-    
