@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from 'react';
@@ -11,7 +12,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, FileBox, Wallet, Clock, BarChart3, Puzzle, Sparkles } from 'lucide-react';
+import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, FileBox, Wallet, Clock, BarChart3, Puzzle, Sparkles, Megaphone } from 'lucide-react';
 import { users, channels, directMessages } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -30,6 +31,7 @@ const mainNav = [
     { href: '/time', icon: Clock, label: 'Time' },
     { href: '/docs', icon: FileBox, label: 'Docs' },
     { href: '/reports', icon: BarChart3, label: 'Reports' },
+    { href: '/brand-voice', icon: Megaphone, label: 'Brand Voice' },
     { href: '/subscription', icon: Sparkles, label: 'Subscription'},
     { href: '/integrations', icon: Puzzle, label: 'Integrations' },
 ];

@@ -32,6 +32,7 @@ import {
   Radio,
   LogOut,
   Sparkles,
+  Megaphone,
 } from 'lucide-react';
 import { channels, directMessages, users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -50,6 +51,7 @@ const mainNav = [
   { href: '/time', icon: Clock, label: 'Time' },
   { href: '/docs', icon: FileBox, label: 'Docs' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
+  { href: '/brand-voice', icon: Megaphone, label: 'Brand Voice' },
   { href: '/subscription', icon: Sparkles, label: 'Subscription'},
   { href: '/integrations', icon: Puzzle, label: 'Integrations' },
 ];
@@ -176,7 +178,9 @@ export function MainSidebar() {
                         </Avatar>
                         <span className="truncate">{otherUser.displayName}</span>
                         {dm.unreadCount && dm.unreadCount > 0 && (
-                           <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-brand/20 text-xs font-bold text-brand">{dm.unreadCount}</span>
+                           <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary/80 text-xs text-primary-foreground">
+                            {dm.unreadCount}
+                           </span>
                         )}
                       </>
                    </SidebarMenuButton>
