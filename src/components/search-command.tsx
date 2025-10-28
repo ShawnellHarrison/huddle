@@ -12,8 +12,8 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, FileBox, Wallet, Clock, BarChart3, Puzzle, Sparkles, Megaphone, Camera } from 'lucide-react';
-import { users, channels, directMessages } from '@/lib/mock-data';
+import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, Wallet, BarChart3, Sparkles, Megaphone, Camera } from 'lucide-react';
+import { users, channels } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface SearchCommandProps {
@@ -29,12 +29,9 @@ const mainNav = [
     { href: '/crm', icon: Users, label: 'CRM' },
     { href: '/snap-to-add', icon: Camera, label: 'Snap to Add' },
     { href: '/expenses', icon: Wallet, label: 'Expenses' },
-    { href: '/time', icon: Clock, label: 'Time' },
-    { href: '/docs', icon: FileBox, label: 'Docs' },
     { href: '/reports', icon: BarChart3, label: 'Reports' },
     { href: '/brand-voice', icon: Megaphone, label: 'Brand Voice' },
     { href: '/subscription', icon: Sparkles, label: 'Subscription'},
-    { href: '/integrations', icon: Puzzle, label: 'Integrations' },
 ];
 
 export function SearchCommand({ open, setOpen }: SearchCommandProps) {

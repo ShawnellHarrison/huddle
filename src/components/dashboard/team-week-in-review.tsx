@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { teamWeekInReviewData } from '@/lib/mock-data';
 import { TrendingUp, Trophy, Zap } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 
 export function TeamWeekInReview() {
   return (

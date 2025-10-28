@@ -5,48 +5,48 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 12% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 12% 8%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 12% 8%;
-    --primary: 165 55% 50%;
-    --primary-foreground: 30 30% 96%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 210 12% 8%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 210 12% 40%;
-    --accent: 135 65% 55%;
-    --accent-foreground: 210 12% 8%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 165 55% 50%;
-    --radius: 0.8rem;
-  }
-
-  .dark {
-    --background: 210 12% 8%;
+    --background: 210 12% 10%;
     --foreground: 30 30% 96%;
     --card: 210 12% 14%;
     --card-foreground: 30 30% 96%;
     --popover: 210 12% 10%;
     --popover-foreground: 30 30% 96%;
-    --primary: 165 55% 58%; /* --brand */
+    --primary: 165 65% 58%; /* --brand */
     --primary-foreground: 210 12% 8%;
-    --secondary: 210 10% 12%; /* --panel-like */
+    --secondary: 210 10% 16%; /* --panel-like */
     --secondary-foreground: 30 30% 96%;
-    --muted: 210 10% 20%;
+    --muted: 210 10% 22%;
     --muted-foreground: 30 20% 78%;
-    --accent: 135 65% 60%;
+    --accent: 145 75% 60%;
     --accent-foreground: 210 12% 8%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 10% 20%;
+    --border: 210 10% 22%;
     --input: 210 10% 20%;
-    --ring: 165 55% 58%;
+    --ring: 165 65% 58%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 210 12% 10%;
+    --foreground: 30 30% 96%;
+    --card: 210 12% 14%;
+    --card-foreground: 30 30% 96%;
+    --popover: 210 12% 10%;
+    --popover-foreground: 30 30% 96%;
+    --primary: 165 65% 58%; /* --brand */
+    --primary-foreground: 210 12% 8%;
+    --secondary: 210 10% 16%; /* --panel-like */
+    --secondary-foreground: 30 30% 96%;
+    --muted: 210 10% 22%;
+    --muted-foreground: 30 20% 78%;
+    --accent: 145 75% 60%;
+    --accent-foreground: 210 12% 8%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 10% 22%;
+    --input: 210 10% 20%;
+    --ring: 165 65% 58%;
     --sidebar-background: 210 12% 8%;
     --sidebar-foreground: 30 20% 78%;
     --sidebar-border: 210 10% 20%;
@@ -69,11 +69,11 @@
 
 @layer components {
   .cozy-panel {
-    @apply rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.7)] backdrop-blur-sm;
+    @apply rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/0.7)] backdrop-blur-sm;
   }
 
   .btn {
-    @apply h-11 px-5 rounded-2xl;
+    @apply h-11 px-5 rounded-xl;
   }
 
   .btn-primary {
@@ -81,7 +81,7 @@
   }
 
   .input {
-    @apply h-11 rounded-2xl border bg-[hsl(var(--panel)/.6)] px-4;
+    @apply h-11 rounded-xl border bg-[hsl(var(--panel)/.6)] px-4;
   }
 
   .xp-outer {

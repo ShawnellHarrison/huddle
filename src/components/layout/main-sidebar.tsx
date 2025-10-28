@@ -23,11 +23,7 @@ import {
   FileText,
   Users,
   Wallet,
-  Clock,
-  FileBox,
   BarChart3,
-  Settings,
-  Puzzle,
   Plus,
   Radio,
   LogOut,
@@ -50,12 +46,9 @@ const mainNav = [
   { href: '/crm', icon: Users, label: 'CRM' },
   { href: '/snap-to-add', icon: Camera, label: 'Snap to Add'},
   { href: '/expenses', icon: Wallet, label: 'Expenses' },
-  { href: '/time', icon: Clock, label: 'Time' },
-  { href: '/docs', icon: FileBox, label: 'Docs' },
   { href: '/reports', icon: BarChart3, label: 'Reports' },
   { href: '/brand-voice', icon: Megaphone, label: 'Brand Voice' },
   { href: '/subscription', icon: Sparkles, label: 'Subscription'},
-  { href: '/integrations', icon: Puzzle, label: 'Integrations' },
 ];
 
 export function MainSidebar() {

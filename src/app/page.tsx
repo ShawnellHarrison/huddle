@@ -1,5 +1,6 @@
 import { BusinessPulseChart } from "@/components/dashboard/business-pulse-chart";
 import { Leaderboard } from "@/components/dashboard/leaderboard";
+import { TeamWeekInReview } from "@/components/dashboard/team-week-in-review";
 
 export default function LobbyPage() {
   return (
@@ -11,6 +12,9 @@ export default function LobbyPage() {
         <div>
           <Leaderboard />
         </div>
+      </div>
+      <div>
+        <TeamWeekInReview />
       </div>
     </div>
   );
