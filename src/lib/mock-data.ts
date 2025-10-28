@@ -109,3 +109,24 @@ export const businessPulseData = [
   { date: 'Sat', Revenue: 3800, Tasks: 2 },
   { date: 'Sun', Revenue: 4300, Tasks: 1 },
 ];
+
+export const teamWeekInReviewData = [
+  {
+    ...users.find(u => u.displayName === 'Sarah'),
+    swi: 92,
+    tasksCompleted: 12,
+    kudos: 5,
+  },
+  {
+    ...users.find(u => u.displayName === 'Emily'),
+    swi: 88,
+    tasksCompleted: 10,
+    kudos: 3,
+  },
+  {
+    ...users.find(u => u.displayName === 'Jane'),
+    swi: 82,
+    tasksCompleted: 8,
+    kudos: 7,
+  },
+];
