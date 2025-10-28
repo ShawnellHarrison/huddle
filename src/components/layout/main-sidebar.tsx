@@ -45,7 +45,7 @@ const mainNav = [
   { href: '/messages', icon: MessageSquare, label: 'Messages' },
   { href: '/projects', icon: KanbanSquare, label: 'Projects' },
   { href: '/invoices', icon: FileText, label: 'Invoices' },
-  { href: '/crm', icon: Users, label: 'CRM' },
+  { href: '/crm', icon: Users, label: 'Users' },
   { href: '/expenses', icon: Wallet, label: 'Expenses' },
   { href: '/time', icon: Clock, label: 'Time' },
   { href: '/docs', icon: FileBox, label: 'Docs' },
