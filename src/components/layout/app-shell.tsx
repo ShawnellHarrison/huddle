@@ -41,6 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [auth, toast]);
   
   const isLoginPage = pathname === '/login';
+  const isMessagesPage = pathname.startsWith('/messages');
 
   const showSidebar = !isLoginPage && !isUserLoading && user;
   const showHeader = !isLoginPage && !isUserLoading && user;
@@ -54,14 +55,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="md:hidden fixed top-3 left-3 z-20">
               <SidebarTrigger />
             </div>
-            <Header />
+            {!isMessagesPage && <Header />}
           </>
         )}
         <main className={cn(
           "flex-1 overflow-y-auto",
           isLoginPage 
             ? "flex min-h-svh flex-col items-center justify-center bg-background"
-            : "p-4 md:p-6 lg:p-8"
+            : isMessagesPage ? 'p-0' : "p-4 md:p-6 lg:p-8",
+          isMessagesPage && 'overflow-hidden'
         )}>
           {children}
         </main>

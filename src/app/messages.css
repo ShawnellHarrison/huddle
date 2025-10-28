@@ -1,0 +1,11 @@
+.chat-bubble {
+    @apply rounded-lg px-4 py-2 max-w-lg break-words;
+}
+
+.chat-bubble-sent {
+    @apply bg-primary text-primary-foreground rounded-br-none;
+}
+
+.chat-bubble-received {
+    @apply bg-secondary text-secondary-foreground rounded-bl-none;
+}

@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css';
+import './messages.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AppShell } from '@/components/layout/app-shell';
 import { FirebaseClientProvider } from '@/firebase';

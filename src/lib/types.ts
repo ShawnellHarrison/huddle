@@ -24,6 +24,14 @@ export interface Channel {
   members: string[];
 }
 
+export interface Message {
+    id: string;
+    channelId: string;
+    fromUid: string;
+    text: string;
+    createdAt: Date;
+}
+
 export interface Project {
     id: string;
     companyId: string;
