@@ -1,3 +1,4 @@
+
 export type UserRole = 'admin' | 'user' | 'client';
 export type UserLevelName = 'bronze' | 'silver' | 'gold' | 'platinum';
 
@@ -66,6 +67,8 @@ export interface Client {
     name: string;
     email: string;
     photoURL: string;
+    dealValue: number;
+    lastContactAt: Date;
 }
 
 export type InvoiceStatus = 'paid' | 'sent' | 'draft' | 'overdue';

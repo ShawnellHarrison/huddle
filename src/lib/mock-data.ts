@@ -1,5 +1,6 @@
+
 import type { User, Channel, Client, Invoice, LineItem } from '@/lib/types';
-import { addDays } from 'date-fns';
+import { addDays, subDays } from 'date-fns';
 
 export const users: User[] = [
   {
@@ -157,9 +158,10 @@ export const weeklyReportData = {
 };
 
 export const clients: Client[] = [
-    { id: 'client-1', companyId: 'company-1', name: 'Innovate Inc.', email: 'contact@innovate.com', photoURL: 'https://picsum.photos/seed/client1/100/100' },
-    { id: 'client-2', companyId: 'company-1', name: 'Apex Solutions', email: 'hello@apex.co', photoURL: 'https://picsum.photos/seed/client2/100/100' },
-    { id: 'client-3', companyId: 'company-1', name: 'Quantum Leap', email: 'support@quantum.io', photoURL: 'https://picsum.photos/seed/client3/100/100' },
+    { id: 'client-1', companyId: 'company-1', name: 'Innovate Inc.', email: 'contact@innovate.com', photoURL: 'https://picsum.photos/seed/client1/100/100', dealValue: 25000, lastContactAt: subDays(new Date(), 5) },
+    { id: 'client-2', companyId: 'company-1', name: 'Apex Solutions', email: 'hello@apex.co', photoURL: 'https://picsum.photos/seed/client2/100/100', dealValue: 50000, lastContactAt: subDays(new Date(), 12) },
+    { id: 'client-3', companyId: 'company-1', name: 'Quantum Leap', email: 'support@quantum.io', photoURL: 'https://picsum.photos/seed/client3/100/100', dealValue: 15000, lastContactAt: subDays(new Date(), 28) },
+    { id: 'client-4', companyId: 'company-1', name: 'Momentum Co.', email: 'partner@momentum.co', photoURL: 'https://picsum.photos/seed/client4/100/100', dealValue: 75000, lastContactAt: subDays(new Date(), 2) },
 ];
 
 export const invoices: Invoice[] = [
