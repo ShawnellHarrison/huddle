@@ -861,6 +861,136 @@
           "format": "date-time"
         }
       }
+    },
+    "IdeaCapsule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "IdeaCapsule",
+      "type": "object",
+      "description": "Represents a new business idea or concept within The Lab.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Idea Capsule."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to the Company the idea belongs to."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title or name of the idea."
+        },
+        "vision": {
+          "type": "string",
+          "description": "A detailed description of the idea's vision."
+        },
+        "tags": {
+          "type": "array",
+          "description": "A list of tags for categorizing the idea.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stage": {
+          "type": "string",
+          "description": "The current stage of the idea.",
+          "enum": ["Concept", "Build", "Live"]
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Reference to the User who created the idea."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the idea was created.",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "companyId", "title", "vision", "stage", "createdBy", "createdAt"]
+    },
+    "LabExperiment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LabExperiment",
+      "type": "object",
+      "description": "Represents an experiment or task performed on an Idea Capsule.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the experiment."
+        },
+        "ideaId": {
+          "type": "string",
+          "description": "Reference to the IdeaCapsule this experiment belongs to."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to the Company the experiment belongs to."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the experiment."
+        },
+        "outcome": {
+          "type": "string",
+          "description": "A summary of the experiment's outcome."
+        },
+        "xpAwarded": {
+          "type": "number",
+          "description": "The amount of XP awarded for completing the experiment."
+        },
+        "runBy": {
+          "type": "string",
+          "description": "Reference to the User who ran the experiment."
+        },
+        "relatedProjectId": {
+          "type": "string",
+          "description": "Optional reference to a Project in Huddle."
+        },
+        "relatedTaskId": {
+          "type": "string",
+          "description": "Optional reference to a Task in Huddle."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the experiment was completed.",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ideaId", "companyId", "title", "xpAwarded", "runBy", "createdAt"]
+    },
+    "LabBadge": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LabBadge",
+      "type": "object",
+      "description": "Represents a badge or achievement earned by a user in The Lab.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the badge."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the badge (e.g., 'Idea Machine', 'Prolific Prototyper')."
+        },
+        "description": {
+          "type": "string",
+          "description": "What the user did to earn the badge."
+        },
+        "icon": {
+          "type": "string",
+          "description": "An emoji or icon name representing the badge."
+        },
+        "awardedTo": {
+          "type": "string",
+          "description": "Reference to the User who was awarded the badge."
+        },
+        "awardedAt": {
+          "type": "string",
+          "description": "Timestamp of when the badge was awarded.",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "name", "description", "icon", "awardedTo", "awardedAt"]
     }
   },
   "auth": {
@@ -1168,6 +1298,39 @@
               "name": "uid",
               "description": "The unique identifier for the user who has the admin role."
             }
+          ]
+        }
+      },
+      {
+        "path": "/ideaCapsules/{ideaId}",
+        "definition": {
+          "entityName": "IdeaCapsule",
+          "schema": { "$ref": "#/backend/entities/IdeaCapsule" },
+          "description": "Stores idea capsules for The Lab feature.",
+          "params": [{ "name": "ideaId", "description": "The unique identifier for the idea capsule." }]
+        }
+      },
+      {
+        "path": "/ideaCapsules/{ideaId}/experiments/{experimentId}",
+        "definition": {
+          "entityName": "LabExperiment",
+          "schema": { "$ref": "#/backend/entities/LabExperiment" },
+          "description": "Stores experiments related to a specific idea capsule.",
+          "params": [
+            { "name": "ideaId", "description": "The ID of the parent idea capsule." },
+            { "name": "experimentId", "description": "The unique ID for the lab experiment." }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/labBadges/{badgeId}",
+        "definition": {
+          "entityName": "LabBadge",
+          "schema": { "$ref": "#/backend/entities/LabBadge" },
+          "description": "Stores badges awarded to a user for their work in The Lab.",
+          "params": [
+            { "name": "userId", "description": "The ID of the user who earned the badge." },
+            { "name": "badgeId", "description": "The unique ID for the lab badge." }
           ]
         }
       }
