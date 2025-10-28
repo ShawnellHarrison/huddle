@@ -23,3 +23,31 @@ export interface Channel {
   unreadCount?: number;
   members: string[];
 }
+
+export interface Project {
+    id: string;
+    companyId: string;
+    name: string;
+    description: string;
+    status: 'active' | 'archived';
+    createdBy: string;
+    members: string[];
+    createdAt: Date;
+}
+
+export interface Task {
+    id: string;
+    projectId: string;
+    title: string;
+    description: string;
+    assignee: string;
+    dueDate: Date;
+    status: 'todo' | 'in_progress' | 'done';
+    priority: 'low' | 'medium' | 'high';
+    tags?: string[];
+    commentsCount: number;
+    attachmentsCount: number;
+    order: number;
+    companyId: string;
+    createdAt: Date;
+}
