@@ -1,32 +1,75 @@
 /**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
+const {onRequest} = require('firebase-functions/v2/https');
+const {setGlobalOptions} = require('firebase-functions');
+const logger = require('firebase-functions/logger');
+const admin = require('firebase-admin');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp();
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+// Set the maximum number of instances for cost control
+setGlobalOptions({maxInstances: 10});
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+/**
+ * Stripe webhook handler to grant premium access.
+ */
+exports.stripeWebhook = onRequest(
+  {secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET']},
+  async (request, response) => {
+    let event;
+    const signature = request.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+    try {
+      event = stripe.webhooks.constructEvent(
+        request.rawBody,
+        signature,
+        webhookSecret
+      );
+    } catch (err) {
+      logger.error('⚠️  Webhook signature verification failed.', err.message);
+      return response.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the checkout.session.completed event
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      const {userId, userEmail} = session.metadata;
+
+      if (!userId) {
+        logger.error(
+          '❌ Missing userId in Stripe checkout session metadata.',
+          {session: session.id}
+        );
+        return response
+          .status(400)
+          .send('Bad Request: Missing userId in metadata.');
+      }
+
+      logger.info(
+        `Processing successful payment for user ${userId} (${userEmail})`
+      );
+
+      try {
+        const userRef = admin.firestore().collection('users').doc(userId);
+        await userRef.set({isPremium: true}, {merge: true});
+
+        logger.info(`✅ Premium access granted for user ${userId}`);
+        response.status(200).json({received: true, accessGranted: true});
+      } catch (error) {
+        logger.error('🔥 Failed to grant premium access.', {
+          userId: userId,
+          error: error.message,
+        });
+        response
+          .status(500)
+          .send('Internal Server Error: Could not update user profile.');
+      }
+    } else {
+      logger.info(`Ignoring unhandled event type: ${event.type}`);
+      response.status(200).json({received: true, handled: false});
+    }
+  }
+);

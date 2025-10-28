@@ -49,6 +49,10 @@
         "xp": {
           "type": "number",
           "description": "The user's current experience points."
+        },
+        "isPremium": {
+            "type": "boolean",
+            "description": "Indicates whether the user has an active premium subscription."
         }
       },
       "required": [

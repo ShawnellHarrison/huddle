@@ -11,13 +11,14 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check } from 'lucide-react';
+import { Check, LogIn } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useFirestore } from '@/firebase/provider';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { HuddleLogo } from '@/components/huddle-logo';
 
 const features = [
   'Access to all premium features',
@@ -32,6 +33,7 @@ export default function SubscriptionPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const [isPremium, setIsPremium] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (user && firestore) {
@@ -50,7 +52,6 @@ export default function SubscriptionPage() {
     }
   }, [user, firestore]);
 
-
   const handleSignIn = async () => {
     if (!auth) return;
     const provider = new GoogleAuthProvider();
@@ -65,22 +66,49 @@ export default function SubscriptionPage() {
     if (!auth) return;
     await signOut(auth);
   };
+  
+  const handleSubscribeClick = () => {
+    if (!user) {
+        handleSignIn();
+        return;
+    }
+    
+    setIsProcessing(true);
+    // Construct the checkout URL with the user's ID and email in the metadata
+    const checkoutUrl = new URL('https://buy.stripe.com/test_00g8xq8J5fHr9eUeUU');
+    checkoutUrl.searchParams.set('client_reference_id', user.uid);
+    // Passing email is helpful for customer management in Stripe
+    if(user.email) {
+      checkoutUrl.searchParams.set('prefilled_email', user.email);
+    }
+
+    // Redirect to Stripe checkout
+    window.location.href = checkoutUrl.toString();
+  }
+  
+  if(isUserLoading){
+      return (
+        <div className="flex items-center justify-center h-screen">
+            <HuddleLogo className="text-2xl animate-pulse" />
+        </div>
+      )
+  }
 
   return (
     <div className="flex items-center justify-center min-h-full bg-gradient-to-br from-purple-500/10 to-indigo-500/10 p-4">
       <Card className="max-w-md w-full shadow-2xl">
         <CardHeader className="text-center p-6">
-           {user && !isUserLoading ? (
+           {user ? (
              <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-2">Signed in as</p>
                 <p className="font-semibold">{user.email}</p>
                 <Button variant="link" onClick={handleSignOut} className="text-destructive h-auto p-0 mt-1">Sign Out</Button>
              </div>
            ) : (
-             <div className="bg-muted p-4 rounded-lg">
+             <div className="bg-muted p-4 rounded-lg flex flex-col items-center">
                 <p className="text-sm text-muted-foreground mb-2">Sign in to subscribe</p>
                 <Button onClick={handleSignIn}>
-                    🔐 Sign In with Google
+                    <LogIn className="mr-2 h-4 w-4" /> Sign In
                 </Button>
             </div>
            )}
@@ -106,32 +134,21 @@ export default function SubscriptionPage() {
             ))}
           </div>
         
-        {!user || isUserLoading ? (
-             <div className="text-center">
-                 <Button disabled className="w-full btn">Subscribe Now</Button>
-                 <p className="text-sm text-primary mt-2">Please sign in to continue</p>
-            </div>
-        ) : isPremium ? (
-            <div className="text-center">
-                <Badge className="bg-green-500 text-primary-foreground mb-4">✓ Premium Member</Badge>
-                <div className="bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 p-3 rounded-md">
-                   You have access to all premium features!
-                </div>
-                 <Button className="w-full btn mt-4">Go to Premium Features</Button>
-            </div>
-        ) : (
-            <a
-              href="https://buy.stripe.com/test_00g8xq8J5fHr9eUeUU"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(
-                'w-full btn btn-primary inline-block text-center',
-                (!user || isUserLoading) && 'opacity-50 cursor-not-allowed'
-              )}
-            >
-              Subscribe Now
-            </a>
-        )}
+          {isPremium ? (
+              <div className="text-center">
+                  <Badge className="bg-green-500 text-primary-foreground mb-4">✓ Premium Member</Badge>
+                  <div className="bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 p-3 rounded-md">
+                     You have access to all premium features!
+                  </div>
+              </div>
+          ) : (
+            <Button
+                onClick={handleSubscribeClick}
+                disabled={isProcessing}
+                className={cn('w-full btn btn-primary')}>
+                {isProcessing ? "Redirecting..." : (user ? "Subscribe Now" : "Sign In & Subscribe")}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>
