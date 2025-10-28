@@ -33,6 +33,7 @@ import {
   LogOut,
   Sparkles,
   Megaphone,
+  Camera,
 } from 'lucide-react';
 import { channels, directMessages, users } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -47,6 +48,7 @@ const mainNav = [
   { href: '/projects', icon: KanbanSquare, label: 'Projects' },
   { href: '/invoices', icon: FileText, label: 'Invoices' },
   { href: '/crm', icon: Users, label: 'CRM' },
+  { href: '/snap-to-add', icon: Camera, label: 'Snap to Add'},
   { href: '/expenses', icon: Wallet, label: 'Expenses' },
   { href: '/time', icon: Clock, label: 'Time' },
   { href: '/docs', icon: FileBox, label: 'Docs' },

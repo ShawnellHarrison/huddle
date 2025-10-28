@@ -12,7 +12,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, FileBox, Wallet, Clock, BarChart3, Puzzle, Sparkles, Megaphone } from 'lucide-react';
+import { FileText, KanbanSquare, LayoutDashboard, MessageSquare, Users, FileBox, Wallet, Clock, BarChart3, Puzzle, Sparkles, Megaphone, Camera } from 'lucide-react';
 import { users, channels, directMessages } from '@/lib/mock-data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -27,6 +27,7 @@ const mainNav = [
     { href: '/projects', icon: KanbanSquare, label: 'Projects' },
     { href: '/invoices', icon: FileText, label: 'Invoices' },
     { href: '/crm', icon: Users, label: 'CRM' },
+    { href: '/snap-to-add', icon: Camera, label: 'Snap to Add' },
     { href: '/expenses', icon: Wallet, label: 'Expenses' },
     { href: '/time', icon: Clock, label: 'Time' },
     { href: '/docs', icon: FileBox, label: 'Docs' },

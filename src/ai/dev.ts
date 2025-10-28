@@ -9,3 +9,4 @@ import '@/ai/flows/categorize-expenses.ts';
 import '@/ai/flows/summarize-document.ts';
 import '@/ai/flows/generate-recurring-invoices.ts';
 import '@/ai/flows/brand-voice-generator.ts';
+import '@/ai/flows/snap-to-add-lead.ts';
