@@ -24,7 +24,6 @@ import {
   doc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
 
 const GenerateRecurringInvoicesInputSchema = z.object({
@@ -141,12 +140,9 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
   async ({ companyId }) => {
     
     const llmResponse = await ai.generate({
-        prompt: `You are an automated billing assistant for the company with ID "${companyId}". Your task is to identify and process recurring monthly invoices that are due for renewal. First, find all renewable invoices using the getRenewableInvoices tool. Then, for each renewable invoice found, create a new draft using the createNewDraftInvoice tool. Finally, report the outcome.`,
+        prompt: `You are an automated billing assistant for the company with ID "${companyId}". Your task is to identify and process recurring monthly invoices that are due for renewal. First, find all renewable invoices using the getRenewableInvoices tool. Then, for each renewable invoice found, create a new draft using the createNewDraftInvoice tool. Finally, report the outcome. If no renewable invoices are found, just say that.`,
         model: 'googleai/gemini-2.5-flash',
         tools: [getRenewableInvoices, createNewDraftInvoice],
-        toolConfig: {
-            execution: 'tool'
-        }
     });
 
     const toolOutputs = llmResponse.toolRequest()?.outputs;
@@ -154,7 +150,7 @@ const generateRecurringInvoicesFlow = ai.defineFlow(
     let createdCount = 0;
     if (toolOutputs) {
         for (const output of toolOutputs) {
-            if(output.toolName === 'createNewDraftInvoice'){
+            if(output.toolName === 'createNewDraftInvoice' && typeof output.output === 'string'){
                 createdCount++;
             }
         }
