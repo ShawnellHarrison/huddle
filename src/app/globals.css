@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -108,5 +109,11 @@
 @layer utilities {
   .text-gradient-brand {
     @apply bg-clip-text text-transparent bg-[linear-gradient(90deg,hsl(var(--brand)),hsl(var(--accent)))];
+  }
+}
+
+@keyframes hue {
+  to {
+    filter: hue-rotate(360deg);
   }
 }
