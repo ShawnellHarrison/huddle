@@ -85,6 +85,8 @@ export interface Invoice {
     currency: string;
     dueDate: Date;
     createdAt: Date;
+    repeatMonthly?: boolean;
+    lastGeneratedAt?: Date;
 }
 
 export interface LineItem {

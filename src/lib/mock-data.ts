@@ -177,6 +177,8 @@ export const invoices: Invoice[] = [
     currency: 'USD',
     dueDate: new Date('2024-09-15'),
     createdAt: new Date('2024-08-15'),
+    repeatMonthly: true,
+    lastGeneratedAt: new Date('2024-09-15'),
   },
   {
     id: 'inv-002',
@@ -203,6 +205,8 @@ export const invoices: Invoice[] = [
     currency: 'USD',
     dueDate: addDays(new Date(), 10),
     createdAt: new Date(),
+    repeatMonthly: true,
+    lastGeneratedAt: new Date(),
   },
   {
     id: 'inv-004',
@@ -214,7 +218,7 @@ export const invoices: Invoice[] = [
     tax: 240,
     total: 1440,
     currency: 'USD',
-    dueDate: addDays(new Date(), -5),
+    dueDate: subDays(new Date(), 5),
     createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000), // 35 days ago
   },
 ];

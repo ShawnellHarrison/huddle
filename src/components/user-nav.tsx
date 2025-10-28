@@ -70,7 +70,9 @@ export function UserNav() {
             </div>
             <div className="flex flex-col items-start text-left group-data-[collapsible=icon]:hidden">
               <span className="text-sm font-medium">{currentUser.displayName}</span>
-              <span className="text-xs text-muted-foreground capitalize">{currentUser.role}</span>
+              <span className={cn("text-xs capitalize", levelColor[currentUser.levelName])}>
+                Level {currentUser.level} - {currentUser.levelName}
+              </span>
             </div>
         </Button>
       </DropdownMenuTrigger>
@@ -88,7 +90,7 @@ export function UserNav() {
           <div className="px-2 py-1.5 text-xs">
             <div className="flex justify-between items-center mb-1">
               <span className={cn("font-bold capitalize", levelColor[currentUser.levelName])}>
-                Level {currentUser.level} - {currentUser.levelName}
+                Level {currentUser.level}
               </span>
               <span className="text-muted-foreground">{currentUser.xp} / 1000 XP</span>
             </div>
