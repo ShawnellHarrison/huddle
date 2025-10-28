@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -18,8 +19,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useAuth, useUser } from '@/firebase';
-import { GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail, signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { users } from '@/lib/mock-data';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { User } from '@/lib/types';
 
 
 function GoogleIcon() {
@@ -60,7 +64,7 @@ export default function LoginPage() {
     if (!auth) return;
     
     const actionCodeSettings = {
-        url: window.location.origin, // URL to redirect back to
+        url: `${window.location.origin}`,
         handleCodeInApp: true,
     };
 
@@ -86,7 +90,6 @@ export default function LoginPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      // The onAuthStateChanged listener will handle the redirect.
     } catch (error) {
       console.error("Google Sign-In Error", error);
        toast({
@@ -96,6 +99,24 @@ export default function LoginPage() {
         });
     }
   };
+
+  const handleQuickLogin = async (email: string) => {
+    if (!auth) return;
+    try {
+      // NOTE: This uses a hardcoded password and is for development purposes only.
+      // In a real application, you would never do this.
+      await signInWithEmailAndPassword(auth, email, 'password123');
+    } catch (error: any) {
+        console.error("Quick Login Error:", error);
+        // This might fail if the user doesn't exist in Firebase Auth.
+        // For a real dev setup, you'd want to pre-provision these users.
+        toast({
+            variant: "destructive",
+            title: `Quick Login Failed for ${email}`,
+            description: "Ensure this mock user exists in Firebase Auth with the password 'password123'.",
+        });
+    }
+  }
   
   if (isUserLoading || user) {
     return (
@@ -106,7 +127,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-sm">
         <div className="cozy-panel p-8 flex flex-col items-center text-center space-y-6">
           <HuddleLogo className="text-2xl"/>
@@ -150,6 +171,30 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+
+        {process.env.NODE_ENV === 'development' && (
+           <Card className="cozy-panel w-full max-w-sm mt-8">
+                <CardHeader>
+                    <CardTitle className="font-headline text-lg">Developer Quick Login</CardTitle>
+                    <CardDescription>Instantly sign in as a mock user.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                    {users.filter(u => u.role !== 'client').map((mockUser: User) => (
+                        <Button
+                            key={mockUser.uid}
+                            variant="secondary"
+                            className="w-full justify-between"
+                            onClick={() => handleQuickLogin(mockUser.email)}
+                        >
+                            <span>Sign in as <b>{mockUser.displayName}</b></span>
+                            <span className="text-muted-foreground text-xs capitalize">{mockUser.role}</span>
+                        </Button>
+                    ))}
+                </CardContent>
+            </Card>
+        )}
     </div>
   );
 }
+
+    
