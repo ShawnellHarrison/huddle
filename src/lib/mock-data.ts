@@ -130,3 +130,27 @@ export const teamWeekInReviewData = [
     kudos: 7,
   },
 ];
+
+export const weeklyReportData = {
+  weekOf: "October 21, 2024",
+  revenue: {
+    amount: 15430,
+    change: 12.5,
+  },
+  newClients: {
+    count: 3,
+    change: 25,
+  },
+  tasksCompleted: {
+    count: 42,
+    goal: 50,
+  },
+  topPerformer: "Jane",
+  taskTrend: [
+    { day: "Mon", tasks: 5 },
+    { day: "Tue", tasks: 8 },
+    { day: "Wed", tasks: 12 },
+    { day: "Thu", tasks: 7 },
+    { day: "Fri", tasks: 10 },
+  ],
+};
