@@ -1,4 +1,5 @@
-import type { User, Channel } from '@/lib/types';
+import type { User, Channel, Client, Invoice, LineItem } from '@/lib/types';
+import { addDays } from 'date-fns';
 
 export const users: User[] = [
   {
@@ -154,3 +155,71 @@ export const weeklyReportData = {
     { day: "Fri", tasks: 10 },
   ],
 };
+
+export const clients: Client[] = [
+    { id: 'client-1', companyId: 'company-1', name: 'Innovate Inc.', email: 'contact@innovate.com', photoURL: 'https://picsum.photos/seed/client1/100/100' },
+    { id: 'client-2', companyId: 'company-1', name: 'Apex Solutions', email: 'hello@apex.co', photoURL: 'https://picsum.photos/seed/client2/100/100' },
+    { id: 'client-3', companyId: 'company-1', name: 'Quantum Leap', email: 'support@quantum.io', photoURL: 'https://picsum.photos/seed/client3/100/100' },
+];
+
+export const invoices: Invoice[] = [
+  {
+    id: 'inv-001',
+    companyId: 'company-1',
+    clientId: 'client-1',
+    number: '2024-001',
+    status: 'paid',
+    subtotal: 4000,
+    tax: 800,
+    total: 4800,
+    currency: 'USD',
+    dueDate: new Date('2024-09-15'),
+    createdAt: new Date('2024-08-15'),
+  },
+  {
+    id: 'inv-002',
+    companyId: 'company-1',
+    clientId: 'client-2',
+    number: '2024-002',
+    status: 'sent',
+    subtotal: 2500,
+    tax: 500,
+    total: 3000,
+    currency: 'USD',
+    dueDate: new Date('2024-10-25'),
+    createdAt: new Date('2024-09-25'),
+  },
+  {
+    id: 'inv-003',
+    companyId: 'company-1',
+    clientId: 'client-3',
+    number: '2024-003',
+    status: 'draft',
+    subtotal: 10000,
+    tax: 2000,
+    total: 12000,
+    currency: 'USD',
+    dueDate: addDays(new Date(), 10),
+    createdAt: new Date(),
+  },
+  {
+    id: 'inv-004',
+    companyId: 'company-1',
+    clientId: 'client-1',
+    number: '2024-004',
+    status: 'overdue',
+    subtotal: 1200,
+    tax: 240,
+    total: 1440,
+    currency: 'USD',
+    dueDate: addDays(new Date(), -5),
+    createdAt: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000), // 35 days ago
+  },
+];
+
+export const lineItems: LineItem[] = [
+    { id: 'li-1', invoiceId: 'inv-001', description: 'Monthly Retainer - August', qty: 1, unitPrice: 4000 },
+    { id: 'li-2', invoiceId: 'inv-002', description: 'Design Sprint', qty: 1, unitPrice: 2500 },
+    { id: 'li-3', invoiceId: 'inv-003', description: 'Full Stack Development (Q4)', qty: 1, unitPrice: 10000 },
+    { id: 'li-4', invoiceId: 'inv-004', description: 'Emergency Server Support', qty: 3, unitPrice: 400 },
+];

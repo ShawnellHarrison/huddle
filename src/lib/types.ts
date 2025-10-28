@@ -51,3 +51,35 @@ export interface Task {
     companyId: string;
     createdAt: Date;
 }
+
+export interface Client {
+    id: string;
+    companyId: string;
+    name: string;
+    email: string;
+    photoURL: string;
+}
+
+export type InvoiceStatus = 'paid' | 'sent' | 'draft' | 'overdue';
+
+export interface Invoice {
+    id: string;
+    companyId: string;
+    clientId: string;
+    number: string;
+    status: InvoiceStatus;
+    subtotal: number;
+    tax: number;
+    total: number;
+    currency: string;
+    dueDate: Date;
+    createdAt: Date;
+}
+
+export interface LineItem {
+    id: string;
+    invoiceId: string;
+    description: string;
+    qty: number;
+    unitPrice: number;
+}
