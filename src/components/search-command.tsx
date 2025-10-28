@@ -21,7 +21,7 @@ interface SearchCommandProps {
 }
 
 const mainNav = [
-    { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/', icon: LayoutDashboard, label: 'Lobby' },
     { href: '/messages', icon: MessageSquare, label: 'Messages' },
     { href: '/projects', icon: KanbanSquare, label: 'Projects' },
     { href: '/invoices', icon: FileText, label: 'Invoices' },
